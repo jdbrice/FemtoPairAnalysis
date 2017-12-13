@@ -1,0 +1,6 @@
+[submodule "modules/FemtoDstFormat"]
+	path = modules/FemtoDstFormat
+	url = git@github.com:jdbrice/FemtoDstFormat.git
+[submodule "modules/FemtoPairFormat"]
+	path = modules/FemtoPairFormat
+	url = git@github.com:jdbrice/FemtoPairFormat.git

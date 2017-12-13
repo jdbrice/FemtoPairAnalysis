@@ -10,7 +10,7 @@ SConscript('color_SConscript')
 Import( 'env' )
 
 SConscript( "modules/FemtoDstFormat/SConstruct" )
-SConscript( "modules/PairDstFormat/SConstruct" )
+SConscript( "modules/FemtoPairFormat/SConstruct" )
 
 env.Append(CPPPATH    = [ "modules/" ])
 env.Append(CXXFLAGS   = ['-std=c++11'])
@@ -37,4 +37,4 @@ env[ "_LIBFLAGS" ] = env[ "_LIBFLAGS" ] + " " + ROOTLIBS + " "
 if "Darwin" in platform.platform() :
 	env[ "LINKFLAGS" ].remove( "-pthread" )
 
-env.Program( target="bin/pico.app", source=[ "modules/PairDstFormat/DictionaryFemtoPair.cpp", "modules/FemtoDstFormat/DictionaryFemtoDst.cpp", "Engine.cpp"] )
+env.Program( target="bin/pico.app", source=[ "modules/FemtoPairFormat/DictionaryFemtoPair.cpp", "modules/FemtoDstFormat/DictionaryFemtoDst.cpp", "Engine.cpp"] )
