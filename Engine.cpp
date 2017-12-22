@@ -10,6 +10,8 @@ using namespace jdb;
 #include <exception>
 
 #include "PairDstAna/PairDstAna.h"
+#include "DeltaTofPdfs/DeltaTofPdfAna.h"
+#include "DeltaTofPdfs/GeneratePdf.h"
 
 
 #define LOGURU_IMPLEMENTATION 1
@@ -21,9 +23,12 @@ int main( int argc, char* argv[] ) {
 	Logger::setGlobalLogLevel( "none" );
 
 	TaskFactory::registerTaskRunner<PairDstAna>( "PairDstAna" );
-
+	TaskFactory::registerTaskRunner<DeltaTofPdfAna>( "DeltaTofPdfAna" );
+	TaskFactory::registerTaskRunner<GeneratePdf>( "GeneratePdf" );
+	
 
 	TaskEngine engine( argc, argv, "PairDstAna" );
-	
+
+
 	return 0;
 }

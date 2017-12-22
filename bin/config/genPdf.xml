@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="GeneratePdf" type="GeneratePdf" config="" nodePath="GeneratePdf"  />
+	<mod></mod>
+
+
+	<p>
+		<nSamples>100000</nSamples>
+	</p>
+	
+	<GeneratePdf>
+		
+		
+		<input>
+			<TFile url="deltaTofPdfs.root" name="d" />
+		</input>
+
+		<output>
+			<TFile url="signalDeltaTofPdf.root" />
+		</output>
+
+	</GeneratePdf>
+
+	<style>
+		<ls_mass linecolor="#000" />
+		<uls_mass linecolor="#00F" />
+	</style>
+
+
+</config>

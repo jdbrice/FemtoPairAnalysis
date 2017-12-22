@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="PairDstAna" type="PairDstAna" config="" nodePath="PairDstAna"  />
+	<mod></mod>
+
+
+	<p>
+		<PidCut>0.9</PidCut>
+		<BgMax>0.2</BgMax>
+		<MinPairPt>2.2</MinPairPt>
+		<BgNormMin>2.0</BgNormMin>
+		<BgScale>1.30</BgScale>
+		<!-- <BgScale>6049</BgScale> -->
+	</p>
+	
+	<PairDstAna>
+		<EventLoop progress="true" />
+		<input>
+			<dst treeName="PairDst" url="pair_dst_charge.root"  maxFiles="-1" />
+		</input>
+
+		<output>
+			<TFile url="res.root" />
+		</output>
+
+		<histograms>
+			<Histo name="uls" title="All MTD matched;M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+			<Histo name="uls_rb" title="All MTD matched;M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.sigMass" />
+
+			<Histo name="scand" title="#mu candidates;M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+			<Histo name="scand_rb" title="#mu candidates;M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.sigMass" />
+
+			<Histo name="pcand" title="#mu candidates;M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+			<Histo name="pcand_rb" title="#mu candidates;M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.sigMass" />
+
+			<Histo name="lscand" title="#mu candidates (++)+(--);M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+			<Histo name="lscand_rb" title="#mu candidates (++)+(--);M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.sigMass" />
+
+			<Histo name="bgshape" title="background shape;M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+			<Histo name="bgshape_rb" title="background shape;M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.sigMass" />
+
+			<Histo name="shapecorr_N" bins_x="bins.mass" />
+			<Histo name="shapecorr_D" bins_x="bins.mass" />
+
+			<Histo name="shapecorr_N_rb" bins_x="bins.scmass" />
+			<Histo name="shapecorr_D_rb" bins_x="bins.scmass" />
+
+			<Histo name="lsdMdPidMin" bins_x="bins.scmass" bins_y="bins.pid" />
+			<Histo name="ulsdMdPidMin" bins_x="bins.scmass" bins_y="bins.pid" />
+			<Histo name="mulsdMdPidMin" bins_x="bins.sigMass" bins_y="bins.pid" />
+			<Histo name="dMdPidMin" bins_x="bins.scmass" />
+			<Histo name="mixedcorr" bins_x="bins.sigMass" />
+
+		</histograms>
+	</PairDstAna>
+
+
+	<bins>
+		<mass min="0" max="5" width="0.02" />
+		<!-- <scmass min="0" max="4" width="0.2" /> -->
+		<sigMass>0.0, 0.2, 0.25, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.07, 2.9, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 5.0</sigMass>
+		<scmass>0.0, 0.2, 0.25, 0.3, 0.4, 0.54, 0.55, 0.56, 0.7, 0.8, 0.9, 0.95, 1.0, 1.4, 2.0, 2.5, 2.8, 3.3, 4.0, 5.0</scmass>
+		<pid min="-0.1" max="1.1" width="0.01" />
+	</bins>
+
+	<style>
+		<lscand linecolor="#000" />
+		<pcand linecolor="#00F" />
+		<bgs linecolor="#F00" />
+	</style>
+
+
+</config>
