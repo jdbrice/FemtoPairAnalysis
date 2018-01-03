@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="JPsiHistogram" type="JPsiHistogram" config="" nodePath="JPsiHistogram"  />
+	<mod></mod>
+
+
+	<p>
+		<nSigmaDeltaY>3</nSigmaDeltaY>
+		<nSigmaDeltaZ>3</nSigmaDeltaZ>
+	</p>
+	
+	<JPsiHistogram>
+		<EventLoop progress="true" />
+		
+		<input>
+			<dst treeName="PairDst" url="pair_dst_charge.root"  maxFiles="-1" />
+		</input>
+
+		<output>
+			<TFile url="jpsi_histograms.root" />
+		</output>
+
+		<histograms>
+			<Histo name="uls" title=";M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" bins_y="bins.pt" />
+		</histograms>
+	</JPsiHistogram>
+
+
+	<bins>
+		<mass min="2.5" max="4.5" width="0.005" />
+		<pt min="0" max="15.0" width="0.005" />
+	</bins>
+
+
+</config>
