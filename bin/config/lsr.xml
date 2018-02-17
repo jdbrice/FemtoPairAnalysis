@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="LikeSignRatioAna" type="LikeSignRatioAna" config="" nodePath="LikeSignRatioAna"  />
+	<mod></mod>
+	
+	<LikeSignRatioAna>
+		<EventLoop progress="true" />
+		<input>
+			<dst treeName="PairDst" url="pair_dst_wopt_NN.root"  maxFiles="-1" />
+		</input>
+
+		<output>
+			<TFile url="lsr.root" />
+		</output>
+
+		<histograms>
+			<Histo name="uls_mixed_0p1" bins_x="bins.mass" />
+			<Histo name="uls_mixed_0p2" bins_x="bins.mass" />
+			<Histo name="uls_mixed_0p3" bins_x="bins.mass" />
+			<Histo name="uls_mixed_0p4" bins_x="bins.mass" />
+			<Histo name="uls_mixed_0p5" bins_x="bins.mass" />
+			<Histo name="uls_mixed_0p6" bins_x="bins.mass" />
+			<Histo name="uls_mixed_0p7" bins_x="bins.mass" />
+			<Histo name="uls_mixed_0p8" bins_x="bins.mass" />
+
+			<Histo name="ls_mixed_0p1" bins_x="bins.mass" />
+			<Histo name="ls_mixed_0p2" bins_x="bins.mass" />
+			<Histo name="ls_mixed_0p3" bins_x="bins.mass" />
+			<Histo name="ls_mixed_0p4" bins_x="bins.mass" />
+			<Histo name="ls_mixed_0p5" bins_x="bins.mass" />
+			<Histo name="ls_mixed_0p6" bins_x="bins.mass" />
+			<Histo name="ls_mixed_0p7" bins_x="bins.mass" />
+			<Histo name="ls_mixed_0p8" bins_x="bins.mass" />
+
+			<Histo name="lsr" bins_x="bins.pid" />
+
+			<Histo name="uls" bins_x="bins.mass" bins_y="bins.pid" />
+			<Histo name="ls" bins_x="bins.mass" bins_y="bins.pid" />
+		</histograms>
+	</LikeSignRatioAna>
+
+
+	<bins>
+		<mass min="0" max="5" width="0.02" />
+		<pid min="-0.1" max="1.1" width="0.01" />
+	</bins>
+
+	<style>
+
+	</style>
+
+
+</config>

@@ -10,6 +10,7 @@ using namespace jdb;
 #include <exception>
 
 #include "PairDstAna/PairDstAna.h"
+#include "PairDstAna/LikeSignRatioAna.h"
 #include "DeltaTofPdfs/DeltaTofPdfAna.h"
 #include "DeltaTofPdfs/GeneratePdf.h"
 
@@ -18,11 +19,12 @@ using namespace jdb;
 #include "vendor/loguru.h"
 
 int main( int argc, char* argv[] ) {
-	loguru::add_file("everything.log", loguru::Truncate, loguru::Verbosity_MAX);
+	// loguru::add_file("everything.log", loguru::Truncate, loguru::Verbosity_MAX);
 
 	Logger::setGlobalLogLevel( "none" );
 
 	TaskFactory::registerTaskRunner<PairDstAna>( "PairDstAna" );
+	TaskFactory::registerTaskRunner<LikeSignRatioAna>( "LikeSignRatioAna" );
 	TaskFactory::registerTaskRunner<DeltaTofPdfAna>( "DeltaTofPdfAna" );
 	TaskFactory::registerTaskRunner<GeneratePdf>( "GeneratePdf" );
 	

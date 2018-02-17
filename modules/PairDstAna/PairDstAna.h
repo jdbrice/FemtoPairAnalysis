@@ -42,7 +42,9 @@ protected:
 
 	float pidCut = -10;
 	float bgMax = 0.0;
+	float bgMax2 = 0.0;
 	float bgMin = 0.0;
+	float bgMin2 = 0.0;
 	float minPairPt = 0.0;
 	float bgScale = 1.0;
 public:
@@ -60,7 +62,9 @@ public:
 
 		pidCut = config.getFloat( "p.PidCut", 0.8 );
 		bgMax = config.getFloat( "p.BgMax", 0.8 );
+		bgMax2 = config.getFloat( "p.BgMax2", 0.8 );
 		bgMin = config.getFloat( "p.BgMin", 0.2 );
+		bgMin2 = config.getFloat( "p.BgMin2", 0.1 );
 		minPairPt = config.getFloat( "p.MinPairPt", 0.0 );
 		bgScale = config.getFloat( "p.BgScale", 1.0 );
 
@@ -154,7 +158,7 @@ protected:
 			
 
 
-			if ( 	pidMax > bgMin && pidMin < bgMax
+			if ( 	pidMax > bgMin && pidMin < bgMax && pidMin > bgMin2 && pidMax < bgMax2
 					// && (pair->d1_mDCA > 0.5 || pair->d2_mDCA > 0.5 )
 					// && (fabs(pair->d1_mDeltaY) > 20 || fabs(pair->d2_mDeltaY) > 20 )
 					// && ( fabs(pair->d1_mDeltaTimeOfFlight) > 1 || fabs( pair->d2_mDeltaTimeOfFlight ) > 1 )
@@ -359,7 +363,7 @@ protected:
 			if ( m < 0.75 )
 				corr = fcorr->Eval( m );
 
-			if ( m > 1.5 && m < 3.0) corr = 1.08;
+			if ( m > 1.1 && m < 3.0) corr = 1.10;
 			if ( m > 3.5 ) corr = 0.70;
 			LOG_F( INFO, "M=%f -> x%f", m, corr );
 			hbgs_rb->SetBinContent( bi, hbgs_rb->GetBinContent(bi) * (1.0*corr) );

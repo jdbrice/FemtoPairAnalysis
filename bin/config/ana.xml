@@ -6,10 +6,13 @@
 
 	<p>
 		<PidCut>0.9</PidCut>
+		<BgMin>0.2</BgMin>
 		<BgMax>0.2</BgMax>
-		<MinPairPt>2.2</MinPairPt>
+		<BgMin2>0.0</BgMin2>
+		<BgMax2>0.95</BgMax2>
+		<MinPairPt>0</MinPairPt>
 		<BgNormMin>2.0</BgNormMin>
-		<BgScale>1.30</BgScale>
+		<BgScale>1.095</BgScale>
 		<!-- <BgScale>6049</BgScale> -->
 	</p>
 	
@@ -56,9 +59,9 @@
 
 
 	<bins>
-		<mass min="0" max="5" width="0.02" />
+		<mass min="0" max="5" width="0.05" />
 		<!-- <scmass min="0" max="4" width="0.2" /> -->
-		<sigMass>0.0, 0.2, 0.25, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.07, 2.9, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 5.0</sigMass>
+		<sigMass>0.0, 0.2, 0.25, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.07, 1.75, 2.9, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0</sigMass>
 		<scmass>0.0, 0.2, 0.25, 0.3, 0.4, 0.54, 0.55, 0.56, 0.7, 0.8, 0.9, 0.95, 1.0, 1.4, 2.0, 2.5, 2.8, 3.3, 4.0, 5.0</scmass>
 		<pid min="-0.1" max="1.1" width="0.01" />
 	</bins>
