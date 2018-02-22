@@ -37,4 +37,4 @@ env[ "_LIBFLAGS" ] = env[ "_LIBFLAGS" ] + " " + ROOTLIBS + " "
 if "Darwin" in platform.platform() :
 	env[ "LINKFLAGS" ].remove( "-pthread" )
 
-env.Program( target="bin/pico.app", source=[ "modules/FemtoPairFormat/DictionaryFemtoPair.cpp", "modules/FemtoDstFormat/DictionaryFemtoDst.cpp", "Engine.cpp"] )
+env.Program( target="bin/pico.app", source=[ "modules/TriggerPatchMapper.cpp", "modules/FemtoPairFormat/DictionaryFemtoPair.cpp", "modules/FemtoDstFormat/DictionaryFemtoDst.cpp", "Engine.cpp"] )

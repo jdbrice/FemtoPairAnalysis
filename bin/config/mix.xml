@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="MixedEventAna" type="MixedEventAna" config="" nodePath="MixedEventAna"  />
+
+	<params>
+		<chargeSum>0</chargeSum>
+		<minPt>0.0</minPt>
+		<maxPt>100.25</maxPt>
+		<weights>map_hit, dEta_dPhi, pt_dEta, pt_dPhi, pt_dEta_dPhi, pt_hit_map, pt_dpt, pt_dBL, same_pt_angle</weights>
+		<mixN>3</mixN>
+	</params>
+
+
+	<MixedEventAna nEventLoops="2">
+		<EventLoop progress="true" />
+		<input>
+			<dst treeName="PairDst" url="pair_dst_wopt_NN.root"  maxFiles="-1" />
+			<!-- <dst treeName="PairDst" url="/home/jdb12/work/dimuonAna/FemtoDst2PairDst/bin/auau_40_60_pair_dst.root"  nEvents="5000000"/> -->
+		</input>
+
+		<output>
+			<TFile url="mixed.root" />
+		</output>
+
+		<histograms>
+			<Histo name="hsame" title="" bins_x="bins.mass" bins_y="bins.pt" />
+			<Histo name="hmix" title="" bins_x="bins.mass" bins_y="bins.pt" />
+			<Histo name="hmixw" title="" bins_x="bins.mass" bins_y="bins.pt" />
+
+
+			<Histo name="same_pt" title="" bins_x="bins.pt" />
+			<Histo name="same_eta" title="" bins_x="bins.eta" />
+			<Histo name="same_phi" title="" bins_x="bins.phi" />
+			<Histo name="same_dCell" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+			<Histo name="same_dMod" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+			<Histo name="same_dBL" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+
+			<!-- <Histo name="same_dY" title="" bins_x="bins.dY" /> -->
+
+			<Histo name="mix_pt" title="" bins_x="bins.pt" />
+			<Histo name="mix_eta" title="" bins_x="bins.eta" />
+			<Histo name="mix_phi" title="" bins_x="bins.phi" />
+			<Histo name="mix_dCell" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+			<Histo name="mix_dMod" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+			<Histo name="mix_dBL" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+
+			<Histo name="mix_dEta_dPhi" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" />
+			<Histo name="mixw_dEta_dPhi" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" />
+			<Histo name="same_dEta_dPhi" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" />
+
+			<Histo name="same_pt_angle" bins_x="bins.angle" bins_y="bins.pt" />
+			<Histo name="mix_pt_angle" bins_x="bins.angle" bins_y="bins.pt" />
+			<Histo name="mixw_pt_angle" bins_x="bins.angle" bins_y="bins.pt" />
+
+			<!-- <Histo name="mix_d_dY" title="" bins_x="bins.dY" /> -->
+
+
+			<Histo name="map_hit" title="" bins_x="bins.hit" bins_y="bins.hit" />
+			<Histo name="dEta_dPhi" title=";dPhi;dEta" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" />
+			<Histo name="pt_dEta" bins_x="bins.deltaEta" bins_y="bins.pt" />
+			<Histo name="pt_dPhi" bins_x="bins.deltaPhi" bins_y="bins.pt" />
+			<Histo name="pt_dBL" bins_x="bins.dCell" bins_y="bins.pt" />
+
+			<Histo name="pt_dEta_dPhi" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" bins_z="bins.pt" />
+			<Histo name="pt_dpt" bins_x="bins.pt" bins_y="bins.pt" />
+			<Histo name="pt_hit_map" bins_x="bins.hit" bins_y="bins.hit" bins_z="bins.pt2" />
+
+		</histograms>
+	</MixedEventAna>
+
+
+	<bins>
+		<mass min="0" max="5" width="0.1" />
+		<!-- <mass>0.0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14, 0.16, 0.18, 0.2, 0.22, 0.24, 0.26, 0.28, 0.3, 0.32, 0.34, 0.36, 0.38, 0.4, 0.42, 0.44, 0.46, 0.48, 0.5, 0.52, 0.54, 0.56, 0.58, 0.6, 0.62, 0.64, 0.66, 0.68, 0.7, 0.72, 0.74, 0.76, 0.78, 0.8, 0.82, 0.84, 0.86, 0.88, 0.9, 0.92, 0.94, 0.96, 0.98, 1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.5, 4.0, 4.5, 5.0</mass> -->
+		<pt2 min="0" max="15" width="10" />
+		<pid min="-0.1" max="1.1" width="0.01" />
+
+		<deltaEta min="0" max="1" width="0.025" />
+		<!-- larger bins do not work well -->
+		<deltaEta> 0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.6, 1.0</deltaEta>
+		<deltaPhi min="0" max="3.2" width="0.01" />
+
+		<pt min="0" max="15" width="0.05" />
+		<eta min="-0.8" max="0.8" width="0.05" />
+		<phi min="-3.2" max="3.2" width="0.01" />
+		<angle min="0" max="3.2" width="0.05" />
+		<dY min="-70" max="70" width="1" />
+
+		<hit min="0" max="1800" width="1" />
+		<dCell min="0" max="30" width="1" />
+	</bins>
+
+</config>

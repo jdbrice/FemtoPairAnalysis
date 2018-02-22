@@ -13,6 +13,7 @@ using namespace jdb;
 #include "PairDstAna/LikeSignRatioAna.h"
 #include "DeltaTofPdfs/DeltaTofPdfAna.h"
 #include "DeltaTofPdfs/GeneratePdf.h"
+#include "MixedEventAna.h"
 
 
 #define LOGURU_IMPLEMENTATION 1
@@ -27,6 +28,8 @@ int main( int argc, char* argv[] ) {
 	TaskFactory::registerTaskRunner<LikeSignRatioAna>( "LikeSignRatioAna" );
 	TaskFactory::registerTaskRunner<DeltaTofPdfAna>( "DeltaTofPdfAna" );
 	TaskFactory::registerTaskRunner<GeneratePdf>( "GeneratePdf" );
+
+	TaskFactory::registerTaskRunner<MixedEventAna>( "MixedEventAna" );
 	
 
 	TaskEngine engine( argc, argv, "PairDstAna" );
