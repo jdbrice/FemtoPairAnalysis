@@ -95,6 +95,7 @@ protected:
 	BranchReader<FemtoPair> _fpr;
 	size_t eventIndex = 0;
 	size_t mixN;
+	size_t nMixed;
 
 
 	vector<TrackObj> buffer_pos;
@@ -137,6 +138,7 @@ public:
 
 		named_weights = config.getStringVector( "params.weights" );
 		mixN = config.get<unsigned int>( "params.mixN", 5 );
+		LOG_F( INFO, "mixN=%lu", mixN );
 	}
 
 protected:
@@ -156,6 +158,9 @@ protected:
 					hWeight[n] = (TH2*)book->get( n );
 			}
 		}
+
+
+		nMixed = 0;
 	}
 
 	int deltaBL( int bl1, int bl2 ){
@@ -192,149 +197,159 @@ protected:
 		}
 		return total / n_bins;
 	}
+	virtual void SameEventLoop(  ){
+
+		FemtoPair * pair = this->_fpr.get();
+
+		if ( fabs(pair->d1_mEta) > 0.5 || fabs(pair->d2_mEta) > 0.5 ) return;
+		
+
+		TLorentzVector lv1, lv2, lv;
+		lv1.SetPtEtaPhiM( pair->d1_mPt, pair->d1_mEta, pair->d1_mPhi, 0.105 );
+		lv2.SetPtEtaPhiM( pair->d2_mPt, pair->d2_mEta, pair->d2_mPhi, 0.105 );
+		lv = lv1 + lv2;
+		
+
+		float pairPid = sqrt( pow( pair->d1_mPid, 2 ) + pow( pair->d2_mPid, 2 ) );
+
+		if ( pairPid > 1.2  ) return;
+
+		if ( abs(pair->mChargeSum) == chargeSum ){
+			TrackObj to1( eventIndex, lv1, pair, 1 );
+			TrackObj to2( eventIndex, lv2, pair, 2 );
+
+			addToBuffer( to1 );
+			addToBuffer( to2 );
+			
+			if ( lv.Pt() > minPt && lv.Pt() < maxPt ){
+				book->fill( "hsame", lv.M(), lv.Pt() );
+				
+
+				float dEta = fabs( lv1.PseudoRapidity() - lv2.PseudoRapidity() );
+				float dPhi = fabs(lv1.DeltaPhi( lv2 ));
+				float angle = to1.lv.Angle( to2.lv.Vect() );
+				((TH2*)hWeight[ "same_pt_angle" ])->Fill( angle, lv.Pt() );
+				((TH2*)hWeight[ "same_dEta_dPhi" ])->Fill( dPhi, dEta );
+			}
+			
+		} // if chargeSum
+
+		eventIndex ++;
+	}
+
+	virtual void MixedEventLoop(){
+		TLorentzVector lv1, lv2, lv;
+			
+		vector<TrackObj> *col1 = &buffer_pos;
+		vector<TrackObj> *col2 = &buffer_pos;
+
+		if ( chargeSum == 0 ){
+			col1 = &buffer_pos;
+			col2 = &buffer_neg;
+		} else if ( chargeSum == 2 ){
+			col1 = &buffer_pos;
+			col2 = &buffer_pos;
+		} else if ( chargeSum == -2 ){
+			col1 = &buffer_neg;
+			col2 = &buffer_neg;
+		}
+
+		
+		for ( size_t i = 0; i < mixN; i++ ){
+			size_t it1 = r3.Integer( col1->size() );
+			TrackObj &to1 = (*col1)[it1];
+			for ( size_t j = 0; j < mixN; j++ ){
+				size_t it2 = r3.Integer( col2->size() );
+				TrackObj &to2 = (*col2)[it2];
+				
+				if ( to1.eventIndex == to2.eventIndex )
+					continue;
+
+				lv = to1.lv + to2.lv;
+				if ( lv.Pt() < minPt || lv.Pt() > maxPt ) continue;
+				if ( to1.tp == to2.tp ) continue;
+				
+				float dPhi = fabs(to1.lv.DeltaPhi( to2.lv ));
+				float dEta = fabs( to1.lv.PseudoRapidity() - to2.lv.PseudoRapidity() );
+				float angle = to1.lv.Angle( to2.lv.Vect() );
+
+				((TH2*)hWeight[ "mix_pt_angle" ])->Fill( angle, lv.Pt() );
+				((TH2*)hWeight[ "mix_dEta_dPhi" ])->Fill( dPhi, dEta );
+
+				hmix->Fill( lv.M(), lv.Pt() );
+				nMixed++;
+			} // loop j
+		} // loop i
+	}
+
+	virtual void WeightedMixedEventLoop(){
+		TLorentzVector lv1, lv2, lv;
+			
+		vector<TrackObj> *col1 = &buffer_pos;
+		vector<TrackObj> *col2 = &buffer_pos;
+
+		if ( chargeSum == 0 ){
+			col1 = &buffer_pos;
+			col2 = &buffer_neg;
+		} else if ( chargeSum == 2 ){
+			col1 = &buffer_pos;
+			col2 = &buffer_pos;
+		} else if ( chargeSum == -2 ){
+			col1 = &buffer_neg;
+			col2 = &buffer_neg;
+		}
+
+		for ( size_t i = 0; i < mixN; i++ ){
+			size_t it1 = r3.Integer( col1->size() );
+			TrackObj &to1 = (*col1)[it1];
+			for ( size_t j = 0; j < mixN; j++ ){
+				size_t it2 = r3.Integer( col2->size() );
+				TrackObj &to2 = (*col2)[it2];
+				
+				if ( to1.eventIndex == to2.eventIndex )
+					continue;
+
+				lv = to1.lv + to2.lv;
+				if ( lv.Pt() < minPt || lv.Pt() > maxPt ) continue;
+				if ( to1.tp == to2.tp ) continue;
+				
+				float dPhi = fabs(to1.lv.DeltaPhi( to2.lv ));
+				float dEta = fabs( to1.lv.PseudoRapidity() - to2.lv.PseudoRapidity() );
+				float angle = to1.lv.Angle( to2.lv.Vect() );
+
+				float wmixed = fweight( hWeight[ "mix_pt_angle" ], norm_const["mix_pt_angle"], angle, lv.Pt() );
+				float wsame = fweight( hWeight[ "same_pt_angle" ], norm_const["same_pt_angle"], angle, lv.Pt() );
+
+				if ( wmixed > 0 )
+					wmixed = 1.0 / wmixed;
+				else 
+					continue;
+
+				((TH2*)hWeight[ "mixwa_pt_angle" ])->Fill( angle, lv.Pt(), wmixed );
+				((TH2*)hWeight[ "mixwb_pt_angle" ])->Fill( angle, lv.Pt(), wmixed * wsame );
+
+				((TH2*)hWeight[ "mixw_dEta_dPhi" ])->Fill( dPhi, dEta, wmixed );
+
+				hmixw->Fill( lv.M(), lv.Pt(), wmixed * wsame );
+				nMixed++;
+			} // loop j
+		} // loop i
+	}
 
 	virtual void analyzeEvent(){
 
 		if ( 0 == iEventLoop){
-
-			FemtoPair * pair = this->_fpr.get();
-
-			if ( fabs(pair->d1_mEta) > 0.5 || fabs(pair->d2_mEta) > 0.5 ) return;
-			
-
-			TLorentzVector lv1, lv2, lv;
-			lv1.SetPtEtaPhiM( pair->d1_mPt, pair->d1_mEta, pair->d1_mPhi, 0.105 );
-			lv2.SetPtEtaPhiM( pair->d2_mPt, pair->d2_mEta, pair->d2_mPhi, 0.105 );
-			lv = lv1 + lv2;
-			// if ( lv.M() < 2.0 ) return;
-
-			float pairPid = sqrt( pow( pair->d1_mPid, 2 ) + pow( pair->d2_mPid, 2 ) );
-
-			if ( pairPid > 0.2  ) return;
-
-			if ( abs(pair->mChargeSum) == chargeSum ){
-				TrackObj to1( eventIndex, lv1, pair, 1 );
-				TrackObj to2( eventIndex, lv2, pair, 2 );
-
-				addToBuffer( to1 );
-				addToBuffer( to2 );
-
-				
-				if ( lv.Pt() > minPt && lv.Pt() < maxPt ){
-					book->fill( "hsame", lv.M(), lv.Pt() );
-					hWeight[ "map_hit"   ]->Fill( to1.hit, to2.hit );
-
-					float dEta = fabs( lv1.PseudoRapidity() - lv2.PseudoRapidity() );
-					float dPhi = fabs(lv1.DeltaPhi( lv2 ));
-					((TH2*)hWeight[ "dEta_dPhi" ])->Fill( dPhi, dEta );
-					((TH2*)hWeight[ "pt_dEta" ])->Fill( dEta, lv.Pt() );
-					((TH2*)hWeight[ "pt_dPhi" ])->Fill( dPhi, lv.Pt() );
-					((TH3*)hWeight[ "pt_dEta_dPhi" ])->Fill( dPhi, dEta, lv.Pt() );
-					
-					((TH2*)hWeight[ "pt_dpt" ])->Fill( pair->d1_mPt, lv.Pt() );
-					((TH2*)hWeight[ "pt_dpt" ])->Fill( pair->d2_mPt, lv.Pt() );
-
-					((TH2*)hWeight[ "pt_dBL" ])->Fill( deltaBL(to1.mBackleg, to2.mBackleg), lv.Pt() );
-
-					book->fill( "same_dEta_dPhi", dPhi, dEta );
-
-					// book->fill( "same_pt", lv.Pt() );
-					// book->fill( "same_eta", lv.PseudoRapidity() );
-					// book->fill( "same_phi", lv.Phi() );
-					// book->fill( "same_dCell", abs(to1.mCell - to2.mCell), lv.M() );
-					// book->fill( "same_dMod", abs(to1.mModule - to2.mModule), lv.M() );
-					// book->fill( "same_dBL", deltaBL(to1.mBackleg, to2.mBackleg), lv.Pt() );
-
-					book->fill( "same_pt_angle", to1.lv.Angle( to2.lv.Vect() ), lv.Pt() );
-				}
-				
-			} // if chargeSum
-
-			eventIndex ++;
+			SameEventLoop();
 		}
 
-
 		if ( 1 == iEventLoop ){
-			
-			TLorentzVector lv1, lv2, lv;
-			
-			vector<TrackObj> *col1 = &buffer_pos;
-			vector<TrackObj> *col2 = &buffer_pos;
-			if ( chargeSum == 0 ){
-				col1 = &buffer_pos;
-				col2 = &buffer_neg;
-			} else if ( chargeSum == 2 ){
-				col1 = &buffer_pos;
-				col2 = &buffer_pos;
-			} else if ( chargeSum == -2 ){
-				col1 = &buffer_neg;
-				col2 = &buffer_neg;
-			}
-
-			for ( size_t i = 0; i < mixN; i++ ){
-				size_t it1 = r3.Integer( col1->size() );
-				TrackObj &to1 = (*col1)[it1];
-				for ( size_t j = 0; j < mixN; j++ ){
-					size_t it2 = r3.Integer( col2->size() );
-					TrackObj &to2 = (*col2)[it2];
-					
-					if ( to1.eventIndex == to2.eventIndex )
-						continue;
-
-					lv = to1.lv + to2.lv;
-					if ( lv.Pt() < minPt || lv.Pt() > maxPt ) continue;
-					if ( to1.tp == to2.tp ) continue;
-					// if ( deltaBL(to1.mBackleg, to2.mBackleg ) > 15  ) continue;
-					// LOG_F( INFO, "dBL=%d", deltaBL(to1.mBackleg, to2.mBackleg ) );
-					// if ( lv.M() < 2.0 ) return;
-					// hmix->Fill( lv.M(), lv.Pt() );
-
-					float dPhi = fabs(to1.lv.DeltaPhi( to2.lv ));
-					float dEta = fabs( to1.lv.PseudoRapidity() - to2.lv.PseudoRapidity() );
-					float angle = to1.lv.Angle( to2.lv.Vect() );
-					// float wdd = fweight( hWeight[ "dEta_dPhi" ], norm_const["dEta_dPhi"], to1.lv.DeltaPhi( to2.lv ), fabs( to1.lv.PseudoRapidity() - to2.lv.PseudoRapidity() ) );
-					// float whit = fweight( hmap_hit, norm_const[ "map_hit" ], to1.hit, to2.hit );
-					// float wdPhi = fweight( (TH2*)hWeight[ "pt_dPhi" ], norm_const[ "pt_dPhi" ], dPhi, lv.Pt() );
-					// float wdEta = fweight( (TH2*)hWeight[ "pt_dEta" ], norm_const[ "pt_dEta" ], dEta, lv.Pt() );
-					// float wptdd = fweight( (TH3*)hWeight[ "pt_dEta_dPhi" ], norm_const[ "pt_dEta_dPhi" ], dPhi, dEta, lv.Pt() );
-					// int hit1 = to1.hit;
-					// int hit2 = to2.hit;
-					// if ( to2.hit < to1.hit ){
-					// 	hit1 = to2.hit;
-					// 	hit2 = to1.hit;
-					// }
-					// float wpthit = fweight( (TH3*)hWeight[ "pt_hit_map" ], norm_const[ "pt_hit_map" ], hit1, hit2, lv.Pt() );
-					// LOG_F( INFO, "weight dPhi ( pt=%f, dPhi=%f, dEta=%f ) = %f", lv.Pt(), dPhi, dEta, wptdd );
-
-					// float wptdpt1 = fweight( (TH2*)hWeight[ "pt_dpt" ], norm_const[ "pt_dpt" ], to1.lv.Pt(), lv.Pt() );
-					// float wptdpt2 = fweight( (TH2*)hWeight[ "pt_dpt" ], norm_const[ "pt_dpt" ], to2.lv.Pt(), lv.Pt() );
-
-					// float wdbl = fweight( (TH2*)hWeight[ "pt_dBL" ], norm_const[ "pt_dBL" ], deltaBL(to1.mBackleg, to2.mBackleg), lv.Pt() );
-
-					float wpta = fweight( hWeight[ "same_pt_angle" ], norm_const[ "same_pt_angle" ], angle, lv.Pt() );
-
-					// book->fill( "mix_pt", lv.Pt() );
-					// book->fill( "mix_eta", lv.PseudoRapidity() );
-					// book->fill( "mix_phi", lv.Phi() );
-					// book->fill( "mix_dCell", abs(to1.mCell - to2.mCell), lv.M() );
-					// book->fill( "mix_dMod", abs(to1.mModule - to2.mModule), lv.M() );
-					// book->fill( "mix_dBL", deltaBL(to1.mBackleg, to2.mBackleg), lv.Pt() );
-
-					book->fill( "mix_pt_angle", angle, lv.Pt() );
-					book->fill( "mixw_pt_angle", angle, lv.Pt(), wpta );
-
-					book->fill( "mix_dEta_dPhi", dPhi, dEta );
-					book->fill( "mixw_dEta_dPhi", dPhi, dEta,  wpta );
-					// if ( wdPhi != wdPhi )
-					// 	LOG_F( INFO, "wdEta=%f, wdPhi=%f", wdEta, wpta );
-					
-
-					hmix->Fill( lv.M(), lv.Pt() );
-					if ( to1.hit != to2.hit )
-						hmixw->Fill( lv.M(), lv.Pt(),  wpta );
-				}
-			}
+			MixedEventLoop();
 		} // iEventLoop == 1
+
+		if ( 2 == iEventLoop ){
+			WeightedMixedEventLoop();
+		} // iEventLoop == 2
+
 	} // analyzeEvent
 
 	float fweight( TH1 * h1, float I, float hit1, float hit2 ){
@@ -386,23 +401,19 @@ protected:
 
 
 		bin1 = hs->GetXaxis()->FindBin( 0.2 );
-		bin2 = hs->GetXaxis()->FindBin( 1.5 );
+		bin2 = hs->GetXaxis()->FindBin( 2.5 );
 
 		Ihs = hs->Integral( bin1, bin2 );
 		Ihmw = hmw->Integral( bin1, bin2 );
 		hmw->Scale( Ihs / Ihmw );
 		
-		// TH1 * hsum = (TH1*)hmw->Clone( TString::Format("hsum_%d_%d", ptBin1, ptBin2 ) );
-		// hsum->Add( hm );
 
 		hs->SetTitle( TString::Format( "%0.2f < p_{T}^{#mu#mu} < %0.2f (GeV/c); M_{#mu#mu} (GeV/c^{2})", pt1, pt2 ) );
 		
 		hs->Draw("pe");
-		hm->Draw("same");
-		if ( (pt1 + pt2)/2.0 > 2.01 )
-			hmw->Draw("same");
-		// hsum->SetLineColor( kGreen );
-		// hsum->Draw("same");
+		hm->Draw("same hpe");
+		hmw->Draw("same hpe");
+		
 		gPad->SetLogy(1);
 		can->Print( "rpMixed.pdf" );
 
@@ -417,18 +428,15 @@ protected:
 		}
 
 		TH1 * hmwr = (TH1*)hmw->Clone( TString::Format("hmwr_%d_%d", ptBin1, ptBin2 ) ); 
-		if ( (pt1 + pt2)/2.0 > 2.01 ){
-			for ( int i = 1; i < hmwr->GetXaxis()->GetNbins()+1; i++ ){
-				float v1 = hmwr->GetBinContent( i );
-				float v2 = hs->GetBinContent( i );
-				float e2 = hs->GetBinError( i );
-				if ( 0 == v2 || 0 == v1  ) continue;
-				hmwr->SetBinContent( i, v1 / v2 );
-				hmwr->SetBinError( i, e2 / v2 );
-			}
+		
+		for ( int i = 1; i < hmwr->GetXaxis()->GetNbins()+1; i++ ){
+			float v1 = hmwr->GetBinContent( i );
+			float v2 = hs->GetBinContent( i );
+			float e2 = hs->GetBinError( i );
+			if ( 0 == v2 || 0 == v1  ) continue;
+			hmwr->SetBinContent( i, v1 / v2 );
+			hmwr->SetBinError( i, e2 / v2 );
 		}
-		// hmr->Divide( hs );
-		// hmw->Divide( hs );
 
 		hmr->Draw( "" );
 		
@@ -444,21 +452,24 @@ protected:
 		tl.DrawLatexNDC( 0.2, 0.8, TString::Format("decorr = %0.3f", fp0->GetParameter( 0 )) );
 		
 		
-		if ( (pt1 + pt2)/2.0 > 2.01 ){
-			TF1 * fp1 = new TF1( "fp1", "pol0" );
-			hmwr->Fit( fp1, "NR", "", 0.0, 1.2 );
-			hmwr->Draw("same");
-			fp1->Draw("same");
-			tl.DrawLatexNDC( 0.2, 0.75, TString::Format("#chi^2 / ndf = %0.2f / %d = %0.2f", fp1->GetChisquare(), fp1->GetNDF(), fp1->GetChisquare() / (float)fp1->GetNDF() ) );
-			tl.DrawLatexNDC( 0.2, 0.7, TString::Format("corr = %0.3f", fp1->GetParameter( 0 )) );
-		}
+		TF1 * fp1 = new TF1( "fp1", "pol0" );
+		hmwr->Fit( fp1, "NR", "", 0.0, 4.0 );
+		hmwr->Draw("same");
+		fp1->SetLineColor(kBlack);
+		fp1->SetRange( 0, 2.2 );
+		fp1->Draw("same");
+		tl.DrawLatexNDC( 0.2, 0.75, TString::Format("#chi^2 / ndf = %0.2f / %d = %0.2f", fp1->GetChisquare(), fp1->GetNDF(), fp1->GetChisquare() / (float)fp1->GetNDF() ) );
+		tl.DrawLatexNDC( 0.2, 0.7, TString::Format("corr = %0.3f", fp1->GetParameter( 0 )) );
+		
 		can->Print( "rpMixed.pdf" );
 	}
 	virtual void postEventLoop(){
 		TreeAnalyzer::postEventLoop();
 
+		LOG_F( INFO, "# of Mixed = %lu", nMixed );
+
 		LOG_F( INFO, "iEventLoop=%d", iEventLoop );
-		if ( 0 == iEventLoop ){
+		if ( iEventLoop <= 1 ){
 			LOG_F( INFO, "buffer_pos.size()=%lu", buffer_pos.size() );
 			LOG_F( INFO, "buffer_neg.size()=%lu", buffer_neg.size() );
 			
@@ -472,7 +483,9 @@ protected:
 
 			hsame->SetLineColor(kRed);
 			hmixw->SetLineColor(kBlack);
-		} else if ( 1 == iEventLoop ){
+		} else if ( 2 == iEventLoop ){
+
+
 
 			TCanvas * can = new TCanvas( "can", "can", 2000, 1000 );
 			gStyle->SetOptStat(0);
@@ -481,8 +494,18 @@ protected:
 			can->SetLeftMargin( 0.1 );
 			can->SetRightMargin( 0.05 );
 
-			for ( float i = 0; i < 10; i+=0.25 ){
-				compareSlice( i, i+0.25, can );
+			book->get( "same_pt_angle" )->Draw("colz");
+			can->Print( "rpMixed.pdf" );
+			book->get( "mix_pt_angle" )->Draw("colz");
+			can->Print( "rpMixed.pdf" );
+			book->get( "mixwa_pt_angle" )->Draw("colz");
+			can->Print( "rpMixed.pdf" );
+			book->get( "mixwb_pt_angle" )->Draw("colz");
+			can->Print( "rpMixed.pdf" );
+
+			float step = config.get<float>( "params.step", 0.25 );
+			for ( float i = 0; i < 10; i+=step ){
+				compareSlice( i, i+step, can );
 			}
 			TH2 * hs = ((TH2*)book->get( "same_dEta_dPhi" ));
 			TH2 * hm = ((TH2*)book->get( "mix_dEta_dPhi" ));
