@@ -6,7 +6,7 @@
 	<LikeSignRatioAna>
 		<EventLoop progress="true" />
 		<input>
-			<dst treeName="PairDst" url="pair_dst_wopt_NN.root"  maxFiles="-1" />
+			<dst treeName="PairDst" url="pair_dst_DNN_N6.root"  maxFiles="-1" />
 		</input>
 
 		<output>

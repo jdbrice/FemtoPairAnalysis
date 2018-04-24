@@ -16,12 +16,16 @@
 #include "TLorentzVector.h"
 #include "TGraphErrors.h"
 #include "TLatex.h"
+#include "TAxis.h"
+#include "TGaxis.h"
 
 
 #include "FemtoDstFormat/BranchReader.h"
 #include "FemtoPairFormat/FemtoPair.h"
 
 #include <algorithm>
+
+
 
 
 class DeltaTofPdfAna : public TreeAnalyzer
@@ -164,10 +168,11 @@ protected:
 
 		gStyle->SetOptStat(0);
 		gStyle->SetOptFit( 1111 );
-		Reporter rp( "rpdeltaTof.pdf", 1200, 1200 );
+		Reporter rp( "rpdeltaTof.pdf", 1200, 700 );
 		
 		rp.newPage();
-		rp.margins( 0.05, 0.01, 0.15, 0.15 );
+		rp.margins( 0.05, 0.02, 0.13, 0.15 );
+		TGaxis::SetMaxDigits(3);
 
 
 		TH1 * hls = book->get("ls_mass");
@@ -176,19 +181,28 @@ protected:
 		hls->Scale( lsScale );
 		hlsjpsi->Scale( lsScale );
 
-		rpl.style( "uls_mass" ).set( config, "style.uls_mass" ).draw();
+		rpl.style( "uls_mass" ).set( config, "style.uls_mass" ).set( "yto", 1.0 ).set( "logy", 0 ).draw();
 		rpl.style( "ls_mass" ).set( config, "style.ls_mass" ).set( "draw", "same" ).draw();
 		rpl.style( "uls_jpsi_mass" ).set( config, "style.uls_mass" ).set( "fillcoloralpha", "#00F", "0.3" ).set("draw", "same").draw();
 		rpl.style( "ls_jpsi_mass" ).set( config, "style.ls_mass" ).set( "fillcoloralpha", "#000", "0.3" ).set("draw", "same").draw();
 
 		TLatex lx;
 		lx.SetTextSize( 14 / 360.0 );
-		lx.DrawLatex( 3.2, 2500, " -1 < n#sigma_{#pi} < 3" );
-		lx.DrawLatex( 3.2, 2300, " dY, dZ < 3#sigma (+0.5 p_{T} > 3 GeV/c))" );
-		lx.DrawLatex( 3.2, 2100, " p_{T}^{leading} > 1.5 (GeV/c)" );
-		lx.DrawLatex( 3.2, 1900, TString::Format( "bg scale = %0.3f", lsScale ) );
+		lx.DrawLatexNDC( 0.6, 0.8, " -1 < n#sigma_{#pi} < 3" );
+		lx.DrawLatexNDC( 0.6, 0.75, " dY, dZ < 3#sigma (+0.5 p_{T} > 3 GeV/c))" );
+		lx.DrawLatexNDC( 0.6, 0.7, " p_{T}^{leading} > 1.5 (GeV/c)" );
+		lx.DrawLatexNDC( 0.6, 0.65, TString::Format( "bg scale = %0.3f", lsScale ) );
+		lx.DrawLatexNDC( 0.6, 0.60, "Signal Region : 3.0 < M < 3.2 (GeV/c^{2})" );
 
+		TLegend * leg = new TLegend( 0.6, 0.85, 0.9, 0.95 );
+		leg->AddEntry( book->get("uls_mass"), "unlike sign" );
+		leg->AddEntry( hls, "like sign" );
+		leg->SetBorderSize( 0 );
+		leg->Draw();
+
+		rp.saveImage( "dtof_inv_mass.pdf" );
 		rp.next();
+		rp.margins( 0.1, 0.15, 0.15, 0.15 );
 
 
 		TH2 * dtofs = (TH2*)book->get( "uls_dtof_vs_pt" );
@@ -199,8 +213,12 @@ protected:
 		dtofdiff->Add( dtofbg, -1 );
 
 		dtofdiff->GetYaxis()->SetRangeUser( -2, 2 );  
+		dtofdiff->SetTitle( "(+-) - [(++)+(--)]" );
 		dtofdiff->Draw("colz");
+
+		rp.saveImage( "dtof_diff_2d.pdf" );
 		rp.next();
+		rp.margins( 0.05, 0.03, 0.13, 0.15 );
 
 		TF1 * fgaus = new TF1( "fgaus", "gaus" );
 		fgaus->SetRange( -1, 1 );
@@ -210,12 +228,16 @@ protected:
 		TH1 * dtof_mean = (TH1*)gDirectory->Get( "dtof_diff_1" );
 		TH1 * dtof_sigma = (TH1*)gDirectory->Get( "dtof_diff_2" );
 
+		dtof_mean->GetYaxis()->SetTitle( "#mu( #Delta TOF ) (ns)" );
+		dtof_sigma->GetYaxis()->SetTitle( "#sigma( #Delta TOF ) (ns)" );
+
 		
 		TF1 * fmean = new TF1( "fmean", "[0] + [1]*exp([2]/x)" );
 		// dtof_mean->Fit( fmean, "SR", "", 0, 3 );
 		float ptswitch = 2.2;
 		TFitResultPtr fmr = dtof_mean->Fit( fmean, "SR", "", 1.0, ptswitch );
 		dtof_mean->GetYaxis()->SetRangeUser( -0.3, 0.3 );
+		rpl.style( dtof_mean ).set( "yto", 1.2 );
 		
 		lx.DrawLatex( 1, -.2, TString::Format("f = [0] + [1]*exp([2]/x) : p_{T} < %0.2f", ptswitch) );
 		lx.DrawLatex( 1, -.25, TString::Format("f = %0.3f : p_{T} >= %0.2f", fmean->Eval( ptswitch ), ptswitch) );
@@ -224,11 +246,14 @@ protected:
 		fmean2->SetParameter( 0, fmean->Eval( ptswitch ) );
 		fmean2->SetRange(ptswitch, 10);
 		fmean2->Draw("same");
+		rp.saveImage( "dtof_mean_fit.pdf" );
 		rp.next();
 
 		TF1 * fsigma = new TF1( "fsigma", "[0] + [1]*exp([2]/x)" );
+
 		TFitResultPtr fsr = dtof_sigma->Fit( fsigma, "SR", "", 0, 10 );
 		dtof_sigma->GetYaxis()->SetRangeUser( 0, 0.5 );
+		rpl.style( dtof_sigma ).set( "yto", 1.5 );
 
 		TGraphErrors * fsge =  FitConfidence::choleskyBands( fsr, fsigma ,100, 100, nullptr, 0, 10 );
 		fsge->SetFillColorAlpha( kRed, 0.3 );
@@ -237,7 +262,7 @@ protected:
 
 		lx.DrawLatex( 3, 0.25, "f = [0] + [1]*exp([2]/x)" );
 
-
+		rp.saveImage( "dtof_sigma_fit.pdf" );
 		rp.next();
 
 		TH1 * hmst = dtofdiff->ProjectionY( "dtof_shape", 5, -1 );
@@ -266,9 +291,7 @@ protected:
 
 		fmean->Write();
 		fsigma->Write();
-
 	}
-
 
 
 

@@ -33,15 +33,12 @@
 			<Histo name="uls_dtof_vs_pt" title="(+-); p_{T}^{#mu} (GeV/c); #Delta TOF (ns)" bins_x="bins.pt" bins_y="bins.dtof" />
 			<Histo name="ls_dtof_vs_pt" title="(++)+(--); p_{T}^{#mu} (GeV/c); #Delta TOF (ns)" bins_x="bins.pt" bins_y="bins.dtof" />
 			<Histo name="bg_dtof_vs_pt" title="(++)+(--); p_{T}^{#mu} (GeV/c); #Delta TOF (ns)" bins_x="bins.pt" bins_y="bins.dtof" />
-
-
-
 		</histograms>
 	</DeltaTofPdfAna>
 
 
 	<bins>
-		<mass min="2.5" max="4.5" width="0.025" />
+		<mass min="2.5" max="4.5" width="0.01" />
 		<pt>0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.5, 5.0, 10.0 </pt>
 		<!-- <pt min="0" max="15" width="0.5" /> -->
 		<dtof min="-20" max="20" width="0.1" />

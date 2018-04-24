@@ -96,6 +96,8 @@ protected:
 	size_t eventIndex = 0;
 	size_t mixN;
 	size_t nMixed;
+	size_t nMixedWeighted;
+
 
 
 	vector<TrackObj> buffer_pos;
@@ -109,11 +111,12 @@ protected:
 	int chargeSum;
 	vector<string> named_weights;
 
+	string rpName;
 
 
 	// params
 	float minPt, maxPt;
-
+	float MIN_PID, MAX_PID;
 	map<string, float> norm_const;
 	map<string, TH1*> hWeight;
 
@@ -138,7 +141,14 @@ public:
 
 		named_weights = config.getStringVector( "params.weights" );
 		mixN = config.get<unsigned int>( "params.mixN", 5 );
+
+		MIN_PID = config.get<float>( "params.minPID", 0 );
+		MAX_PID = config.get<float>( "params.maxPID", 0.1 );
+		LOG_F( INFO, "PID = ( %f, %f)", MIN_PID, MAX_PID );
 		LOG_F( INFO, "mixN=%lu", mixN );
+
+		rpName = string(TString::Format( "rpMixed_cs%d_pid%f_%f.pdf", chargeSum, MIN_PID, MAX_PID ).Data());
+
 	}
 
 protected:
@@ -160,7 +170,10 @@ protected:
 		}
 
 
-		nMixed = 0;
+		if ( iEventLoop <= 1 )
+			nMixed = 0;
+		if ( iEventLoop <= 2 )
+			nMixedWeighted = 0;
 	}
 
 	int deltaBL( int bl1, int bl2 ){
@@ -212,7 +225,7 @@ protected:
 
 		float pairPid = sqrt( pow( pair->d1_mPid, 2 ) + pow( pair->d2_mPid, 2 ) );
 
-		if ( pairPid > 1.2  ) return;
+		if ( pairPid > MAX_PID || pairPid < MIN_PID  ) return;
 
 		if ( abs(pair->mChargeSum) == chargeSum ){
 			TrackObj to1( eventIndex, lv1, pair, 1 );
@@ -331,7 +344,7 @@ protected:
 				((TH2*)hWeight[ "mixw_dEta_dPhi" ])->Fill( dPhi, dEta, wmixed );
 
 				hmixw->Fill( lv.M(), lv.Pt(), wmixed * wsame );
-				nMixed++;
+				nMixedWeighted++;
 			} // loop j
 		} // loop i
 	}
@@ -382,60 +395,85 @@ protected:
 	}
 	void compareSlice( float pt1, float pt2, TCanvas * can ){
 
+		
 		int ptBin1 = hsame->GetYaxis()->FindBin( pt1 );
 		int ptBin2 = hsame->GetYaxis()->FindBin( pt2 );
+
 
 		TH1 * hs = hsame->ProjectionX( TString::Format("hs_%d_%d", ptBin1, ptBin2 ), ptBin1, ptBin2 );
 		TH1 * hm = hmix->ProjectionX( TString::Format("hm_%d_%d", ptBin1, ptBin2 ), ptBin1, ptBin2 );
 		TH1 * hmw = hmixw->ProjectionX( TString::Format("hmw_%d_%d", ptBin1, ptBin2 ), ptBin1, ptBin2 );
 
-		int bin1 = hs->GetXaxis()->FindBin( 2.0 );
-		int bin2 = hs->GetXaxis()->FindBin( 4.0 );
 
-		float Ihs = hs->Integral( bin1, bin2 );
-		float Ihm = hm->Integral( bin1, bin2 );
-		float Ihmw = hmw->Integral( bin1, bin2 );
+		int hsbin1 = hs->GetXaxis()->FindBin( 2.0 );
+		int hsbin2 = hs->GetXaxis()->FindBin( 2.4 );
+
+		int hmbin1 = hm->GetXaxis()->FindBin( 2.0 );
+		int hmbin2 = hm->GetXaxis()->FindBin( 2.4 );
+
+		float hmbw = hm->GetBinWidth( 10 );
+		float hsbw = hs->GetBinWidth( 10 );
+
+		float Ihs = hs->Integral( hsbin1, hsbin2 );
+		float Ihm = hm->Integral( hmbin1, hmbin2 );
+		
+
+		hm->Sumw2();
+		hmw->Sumw2();
 
 
 		hm->Scale( Ihs / Ihm );
+		hm->Scale( hsbw / hmbw  );
 
 
-		bin1 = hs->GetXaxis()->FindBin( 0.2 );
-		bin2 = hs->GetXaxis()->FindBin( 2.5 );
+		hmbin1 = hm->GetXaxis()->FindBin( 0.3 );
+		hmbin2 = hm->GetXaxis()->FindBin( 4.0 );
 
-		Ihs = hs->Integral( bin1, bin2 );
-		Ihmw = hmw->Integral( bin1, bin2 );
+		hsbin1 = hs->GetXaxis()->FindBin( 0.3 );
+		hsbin2 = hs->GetXaxis()->FindBin( 4.0 );
+
+		Ihs = hs->Integral( hsbin1, hsbin2 );
+		float Ihmw = hmw->Integral( hmbin1, hmbin2 );
+		
 		hmw->Scale( Ihs / Ihmw );
+		hmw->Scale( hsbw / hmbw  );
 		
 
-		hs->SetTitle( TString::Format( "%0.2f < p_{T}^{#mu#mu} < %0.2f (GeV/c); M_{#mu#mu} (GeV/c^{2})", pt1, pt2 ) );
+		hs->SetTitle( TString::Format( "%0.2f < p_{T}^{#mu#mu} < %0.2f (GeV/c); M_{#mu#mu} (GeV/c^{2}); dN/dM_{#mu#mu} (GeV/c^{2})^{-1}", pt1, pt2 ) );
 		
 		hs->Draw("pe");
 		hm->Draw("same hpe");
 		hmw->Draw("same hpe");
 		
 		gPad->SetLogy(1);
-		can->Print( "rpMixed.pdf" );
+		can->Print( rpName.c_str() );
 
-		TH1 * hmr = (TH1*)hm->Clone( TString::Format("hmr_%d_%d", ptBin1, ptBin2 ) ); 
+
+		HistoBins ratio_bins( config, "bins.mass_ratio" );
+		// Compute the ratios
+		TH1 * hsratio = (TH1*) hs->Rebin( ratio_bins.nBins(), TString::Format("hsr_%d_%d", ptBin1, ptBin2 ), ratio_bins.bins.data() );
+
+		TH1 * hmr = (TH1*)hm->Rebin( ratio_bins.nBins(), TString::Format("hmr_%d_%d", ptBin1, ptBin2 ), ratio_bins.bins.data() ); 
+
 		for ( int i = 1; i < hmr->GetXaxis()->GetNbins()+1; i++ ){
 			float v1 = hmr->GetBinContent( i );
-			float v2 = hs->GetBinContent( i );
-			float e2 = hs->GetBinError( i );
+			float v2 = hsratio->GetBinContent( i );
+			float e2 = hsratio->GetBinError( i );
 			if ( 0 == v2 ) continue;
-			hmr->SetBinContent( i, v1/v2 );
-			hmr->SetBinError( i, e2 / v2 );
+			hmr->SetBinContent( i, (v1/v2) * (hmbw / hsbw) );
+			hmr->SetBinError( i, (e2 / v2) * (hmbw / hsbw) );
 		}
 
-		TH1 * hmwr = (TH1*)hmw->Clone( TString::Format("hmwr_%d_%d", ptBin1, ptBin2 ) ); 
+		TH1 * hmwr = (TH1*)hmw->Rebin( ratio_bins.nBins(), TString::Format("hmwr_%d_%d", ptBin1, ptBin2 ), ratio_bins.bins.data() ); 
+		// TH1 * hmwr = (TH1*)hmw->Clone( TString::Format("hmwr_%d_%d", ptBin1, ptBin2 ) ); 
 		
 		for ( int i = 1; i < hmwr->GetXaxis()->GetNbins()+1; i++ ){
 			float v1 = hmwr->GetBinContent( i );
-			float v2 = hs->GetBinContent( i );
-			float e2 = hs->GetBinError( i );
+			float v2 = hsratio->GetBinContent( i );
+			float e2 = hsratio->GetBinError( i );
 			if ( 0 == v2 || 0 == v1  ) continue;
-			hmwr->SetBinContent( i, v1 / v2 );
-			hmwr->SetBinError( i, e2 / v2 );
+			hmwr->SetBinContent( i, (v1 / v2) * (hmbw / hsbw) );
+			hmwr->SetBinError( i, (e2 / v2) * (hmbw / hsbw) );
 		}
 
 		hmr->Draw( "" );
@@ -453,15 +491,16 @@ protected:
 		
 		
 		TF1 * fp1 = new TF1( "fp1", "pol0" );
-		hmwr->Fit( fp1, "NR", "", 0.0, 4.0 );
+		fp1->SetRange( 0.2, 3.0 );
+		hmwr->Fit( fp1, "NR", "", 0.2, 3.0 );
 		hmwr->Draw("same");
 		fp1->SetLineColor(kBlack);
-		fp1->SetRange( 0, 2.2 );
+		fp1->SetRange( 0, 4.0 );
 		fp1->Draw("same");
 		tl.DrawLatexNDC( 0.2, 0.75, TString::Format("#chi^2 / ndf = %0.2f / %d = %0.2f", fp1->GetChisquare(), fp1->GetNDF(), fp1->GetChisquare() / (float)fp1->GetNDF() ) );
 		tl.DrawLatexNDC( 0.2, 0.7, TString::Format("corr = %0.3f", fp1->GetParameter( 0 )) );
 		
-		can->Print( "rpMixed.pdf" );
+		can->Print( rpName.c_str() );
 	}
 	virtual void postEventLoop(){
 		TreeAnalyzer::postEventLoop();
@@ -489,24 +528,26 @@ protected:
 
 			TCanvas * can = new TCanvas( "can", "can", 2000, 1000 );
 			gStyle->SetOptStat(0);
-			can->Print( "rpMixed.pdf[" );
+			can->Print( (rpName+"[").c_str() );
 			can->SetTopMargin( 0.01 );
 			can->SetLeftMargin( 0.1 );
 			can->SetRightMargin( 0.05 );
 
 			book->get( "same_pt_angle" )->Draw("colz");
-			can->Print( "rpMixed.pdf" );
+			can->Print( rpName.c_str() );
 			book->get( "mix_pt_angle" )->Draw("colz");
-			can->Print( "rpMixed.pdf" );
+			can->Print( rpName.c_str() );
 			book->get( "mixwa_pt_angle" )->Draw("colz");
-			can->Print( "rpMixed.pdf" );
+			can->Print( rpName.c_str() );
 			book->get( "mixwb_pt_angle" )->Draw("colz");
-			can->Print( "rpMixed.pdf" );
+			can->Print( rpName.c_str() );
 
+			compareSlice( 0, 30, can );
 			float step = config.get<float>( "params.step", 0.25 );
 			for ( float i = 0; i < 10; i+=step ){
 				compareSlice( i, i+step, can );
 			}
+			
 			TH2 * hs = ((TH2*)book->get( "same_dEta_dPhi" ));
 			TH2 * hm = ((TH2*)book->get( "mix_dEta_dPhi" ));
 			hm->SetLineColor( kRed);
@@ -540,7 +581,7 @@ protected:
 
 
 
-			can->Print( "rpMixed.pdf]" );
+			can->Print( (rpName + "]").c_str() );
 
 		}
 	}

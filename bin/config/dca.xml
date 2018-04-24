@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="DcaPdfAna" type="DcaPdfAna" config="" nodePath="DcaPdfAna"  />
+	<mod></mod>
+
+
+	<p>
+		<lsScale>1.15</lsScale>
+		<nSigmaDeltaY>3</nSigmaDeltaY>
+		<nSigmaDeltaZ>3</nSigmaDeltaZ>
+		<nSigmaDeltaTof>3</nSigmaDeltaTof>
+	</p>
+	
+	<DcaPdfAna>
+		<EventLoop progress="true" />
+		
+		<input>
+			<dst treeName="PairDst" url="pair_dst_charge.root"  maxFiles="-1" />
+		</input>
+
+		<output>
+			<TFile url="dcaPdfs.root" />
+		</output>
+
+		<histograms>
+			
+			<Histo name="uls_mass" title=";M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+			<Histo name="ls_mass" title=";M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+
+			<Histo name="uls_jpsi_mass" title=";M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+			<Histo name="ls_jpsi_mass" title=";M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+			<Histo name="ls_bg_mass" title=";M_{#mu#mu} (GeV/c^{2}); dN/dM (GeV/c^{2})^{-1}" bins_x="bins.mass" />
+
+			<Histo name="uls_dca_vs_pt" title="(+-); p_{T}^{#mu} (GeV/c); DCA (cm)" bins_x="bins.pt" bins_y="bins.dca" />
+			<Histo name="ls_dca_vs_pt" title="(++)+(--); p_{T}^{#mu} (GeV/c); DCA (cm)" bins_x="bins.pt" bins_y="bins.dca" />
+			<Histo name="bg_dca_vs_pt" title="(++)+(--); p_{T}^{#mu} (GeV/c); DCA (cm)" bins_x="bins.pt" bins_y="bins.dca" />
+
+			<Histo name="dca_vs_pt" title="; p_{T}^{#mu} (GeV/c); DCA (cm)" bins_x="bins.ptfine" bins_y="bins.dcafine" />
+
+			<Histo name="param_mean" title="; p_{T} (GeV/c); mean" bins_x="bins.pt" />
+			<Histo name="param_sigma" title="; p_{T} (GeV/c); sigma" bins_x="bins.pt" />
+
+		</histograms>
+	</DcaPdfAna>
+
+
+	<bins>
+		<mass min="2.5" max="4.5" width="0.025" />
+		<!-- <pt min="0.0" max="10" width="0.25" /> -->
+		<pt>0.0, 0.25, 0.5, 0.75, 1.0, 1.1, 1.3, 1.5, 1.6, 1.7, 1.8, 2.0, 2.5, 5.0, 15.0 </pt>
+		<ptfine min="0.0" max="15.0" width="0.1" />
+		<dca min="0" max="3.4" width="0.05" />
+		<dcafine min="0" max="3.4" width="0.01" />
+		
+
+	</bins>
+
+	<style>
+		<ls_mass linecolor="#000" />
+		<uls_mass linecolor="#00F" />
+	</style>
+
+
+</config>
