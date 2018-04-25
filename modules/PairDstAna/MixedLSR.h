@@ -60,8 +60,8 @@ public:
 			euls = sqrt( vuls );
 			els = sqrt( vls );
 
-			hlsr->SetBinContent( i+2,  vuls / vls );
-			hlsr->SetBinError( i+2,  (vuls / vls) * sqrt( pow(euls / vuls, 2) + pow(els / vls, 2) )  );
+			hlsr->SetBinContent( i+2,  vuls  );
+			hlsr->SetBinError( i+2,  (vuls ) * sqrt( pow(euls / vuls, 2) + pow(els / vls, 2) )  );
 
 			rpl.style( huls_mw ).set("lc", "#000" ).set("draw", "hpe").set("logy", 1).draw();
 			rpl.style( hls_mw ).set("lc", "#F00" ).set("draw", "same hpe").draw();
@@ -87,8 +87,8 @@ public:
 			float vuls = huls->IntegralAndError( xuls->FindBin( m1 ), xuls->FindBin( m2 ), euls );
 			float vls = hls->IntegralAndError( xls->FindBin( m1 ), xls->FindBin( m2 ), els );
 
-			hlsrd->SetBinContent( i+2,  vuls / vls );
-			hlsrd->SetBinError( i+2,  (vuls / vls) * sqrt( pow(euls / vuls, 2) + pow(els / vls, 2) )  );
+			hlsrd->SetBinContent( i+2,  vuls  );
+			hlsrd->SetBinError( i+2,  (vuls ) * sqrt( pow(euls / vuls, 2) + pow(els / vls, 2) )  );
 
 			rpl.style( huls ).set("lc", "#000" ).set("draw", "hpe").set("logy", 1).draw();
 			rpl.style( hls ).set("lc", "#F00" ).set("draw", "same hpe").draw();
@@ -100,15 +100,15 @@ public:
 		
 		
 		TF1 * fitFunc = new TF1( "fitfunc", "pol1" );
-		TFitResultPtr fitPointer = hlsrd->Fit( fitFunc, "SR", "", config.get<float>("fit:x1", 0), config.get<float>("fit:x2", 1.3) );
-		gPad->SetLogy(0);
-		// rpl.style( hlsrdd ).set( "lc", "#000" ).set("draw", "same pe").set("logy", 0).draw();
+		TFitResultPtr fitPointer = hlsr->Fit( fitFunc, "SR", "", config.get<float>("fit:x1", 0), config.get<float>("fit:x2", 1.3) );
+		gPad->SetLogy(1);
+		rpl.style( hlsrd ).set( "lc", "#000" ).set("draw", "same pe").set("logy", 0).draw();
 
 		fitFunc->SetRange( -0.1, 1.4 );
 		TGraphErrors * band = FitConfidence::choleskyBands( fitPointer, fitFunc, 100, 400 );
 
-		float v = hlsrd->GetBinContent( 5 );
-		rpl.style(hlsrd).set( "yr", v/2, v*2 );
+		float v = hlsr->GetBinContent( 5 );
+		// rpl.style(hlsr).set( "yr", v/2, v*2 );
 
 		band->SetFillColorAlpha( kRed, 0.7 );
 		band->Draw( "same e3" );

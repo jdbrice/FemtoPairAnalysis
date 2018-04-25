@@ -3,15 +3,17 @@
 	<Task name="MixedEventAna" type="MixedEventAna" config="" nodePath="MixedEventAna"  />
 
 	<params>
-		<chargeSum>2</chargeSum>
-		<minPt>0.0</minPt>
+		<chargeSum>0</chargeSum>
+		<minPt>2.2</minPt>
 		<maxPt>100.25</maxPt>
 		<weights>same_pt_angle, mix_pt_angle, same_dEta_dPhi, mix_dEta_dPhi, mixwa_pt_angle, mixwb_pt_angle, mixw_dEta_dPhi</weights>
 		<mixN>3</mixN>
 		<step>0.1</step>
 
-		<minPID>0.0</minPID>
-		<maxPID>0.1</maxPID>
+		<minPID>0.95</minPID> 
+		<maxPID>0.95</maxPID>
+		<cutPID>0.6</cutPID>
+		<usePairPID>false</usePairPID>
 
 	</params>
 
@@ -19,7 +21,7 @@
 	<MixedEventAna nEventLoops="3">
 		<EventLoop progress="true" />
 		<input>
-			<dst treeName="PairDst" url="pair_dst_wopt_NN.root"  maxFiles="10000" />
+			<dst treeName="PairDst" url="pair_dst_DNN_N6.root"  maxFiles="10000" />
 			<!-- <dst treeName="PairDst" url="/home/jdb12/work/dimuonAna/FemtoDst2PairDst/bin/auau_60_80_pair_dst.root"  nEvents="-1"/> -->
 		</input>
 

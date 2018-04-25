@@ -16,6 +16,7 @@ using namespace jdb;
 #include "DeltaTofPdfs/GeneratePdf.h"
 #include "MixedEventAna.h"
 #include "DcaPdfAna.h"
+#include "SignalMaker.h"
 
 
 #define LOGURU_IMPLEMENTATION 1
@@ -31,7 +32,7 @@ int main( int argc, char* argv[] ) {
 	TaskFactory::registerTaskRunner<MixedLSR>( "MixedLSR" );
 	TaskFactory::registerTaskRunner<DeltaTofPdfAna>( "DeltaTofPdfAna" );
 	TaskFactory::registerTaskRunner<GeneratePdf>( "GeneratePdf" );
-
+	TaskFactory::registerTaskRunner<SignalMaker>( "SignalMaker" );
 	TaskFactory::registerTaskRunner<MixedEventAna>( "MixedEventAna" );
 	TaskFactory::registerTaskRunner<DcaPdfAna>( "DcaPdfAna" );
 	

@@ -1,5 +1,5 @@
-#ifndef MIXED_EVENT_ANA_H
-#define MIXED_EVENT_ANA_H
+#ifndef MIXED_PID_ANA_H
+#define MIXED_PID_ANA_H
 
 #include "TreeAnalyzer.h"
 
@@ -89,7 +89,7 @@ public:
 	}
 };
 
-class MixedEventAna : public TreeAnalyzer
+class MixedPidAna : public TreeAnalyzer
 {
 protected:
 	BranchReader<FemtoPair> _fpr;
@@ -116,14 +116,13 @@ protected:
 
 	// params
 	float minPt, maxPt;
-	float MIN_PID, MAX_PID, CUT_PID;
-	bool usePairPID = true;
+	float MIN_PID, MAX_PID;
 	map<string, float> norm_const;
 	map<string, TH1*> hWeight;
 
 public:
-	MixedEventAna() {}
-	~MixedEventAna() {}
+	MixedPidAna() {}
+	~MixedPidAna() {}
 
 	virtual void initialize(){
 		TreeAnalyzer::initialize();
@@ -140,17 +139,14 @@ public:
 		minPt = config.get<float>( "params.minPt", 0 );
 		maxPt = config.get<float>( "params.maxPt", 100 );
 
-		named_weights = config.getStringVector( "params.weights" );
 		mixN = config.get<unsigned int>( "params.mixN", 5 );
 
-		MIN_PID = config.get<float>( "params.minPID", 0 );
-		MAX_PID = config.get<float>( "params.maxPID", 0.1 );
-		CUT_PID = config.get<float>( "params.cutPID", 0.1 );
-		usePairPID = config.getBool( "params.usePairPID", true );
-		LOG_F( INFO, "PID = ( %f, %f)", MIN_PID, MAX_PID );
+		MIN_MASS = config.get<float>( "params.minMass", 0 );
+		MAX_MASS = config.get<float>( "params.maxMass", 0.1 );
+		LOG_F( INFO, "MASS = ( %f, %f)", MIN_MASS, MAX_MASS );
 		LOG_F( INFO, "mixN=%lu", mixN );
 
-		rpName = string(TString::Format( "rpMixed_cs%d_pid%f_%f.pdf", chargeSum, MIN_PID, MAX_PID ).Data());
+		rpName = string(TString::Format( "rpMixed_cs%d_pid%f_%f.pdf", chargeSum, MIN_MASS, MAX_MASS ).Data());
 
 	}
 
@@ -227,16 +223,8 @@ protected:
 		
 
 		float pairPid = sqrt( pow( pair->d1_mPid, 2 ) + pow( pair->d2_mPid, 2 ) );
-		float minPid = TMath::Min( pair->d1_mPid, pair->d2_mPid );
-		float maxPid = TMath::Max( pair->d1_mPid, pair->d2_mPid );
 
-		if ( usePairPID ){
-			if ( pairPid > MAX_PID || pairPid < MIN_PID  ) return;
-		} else {
-			if ( minPid > MAX_PID || maxPid < MIN_PID ) return;
-			if ( minPid < CUT_PID ) return;
-		}
-		
+		if ( pairPid > MAX_PID || pairPid < MIN_PID  ) return;
 
 		if ( abs(pair->mChargeSum) == chargeSum ){
 			TrackObj to1( eventIndex, lv1, pair, 1 );
