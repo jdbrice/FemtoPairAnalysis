@@ -217,13 +217,13 @@ protected:
 		TH1 *hls = book->get( "ls" );
 		TH1 *hbg = book->get( "bg" );
 
-		TH1 * hf = (TH1*)hls->Clone( "tmpfactor" );
+		TH1 * hf = (TH1*)book->get( "cfactor" )->Clone( "tmpfactor" );
 		hf->Reset();
 
-		TAxis * x = hls->GetXaxis();
-		TAxis * y = hls->GetYaxis();
+		TAxis * x = hls2->GetXaxis();
+		TAxis * y = hls2->GetYaxis();
 
-		for ( size_t ix = 1; ix <= x->GetNbins(); ix++ ){
+		for ( size_t ix = 1; ix <= hf->GetXaxis()->GetNbins(); ix++ ){
 			size_t a = ix;
 			size_t b = ix;
 			// if ( b >= x->GetNbins() ){
@@ -274,8 +274,9 @@ protected:
 			TF1 * fpol0 = new TF1( "fpol0", config.getString( "p.fit:formula", "pol0" ).c_str() );
 			hr->Fit( fpol0, "R", "", config.get<float>("p.fit:min", 1.0), config.get<float>("p.fit:max", 1.2) );
 
-			hr->SetMinimum( fpol0->Eval( 1.4 ) - 1.0 );
-			hr->SetMaximum( fpol0->Eval( 1.4 ) + 1.0 );
+			// hr->SetMinimum( fpol0->Eval( 1.4 ) - 1.0 );
+			hr->SetMinimum( 0.0 );
+			hr->SetMaximum( fpol0->Eval( 1.4 ) + 3.0 );
 
 			hbg->SetBinContent( ix, hbg->GetBinContent( ix ) * fpol0->Eval(1.4) );
 			hf->SetBinContent( ix, fpol0->Eval( 1.4 ) );

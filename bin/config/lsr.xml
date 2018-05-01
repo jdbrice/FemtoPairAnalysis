@@ -3,7 +3,7 @@
 	<Task name="LikeSignRatioAna" type="LikeSignRatioAna" config="" nodePath="LSR"  />
 
 	<p>
-		<fit min="0.3" max="1.1" formula="pol1" />
+		<fit min="0.0" max="1.2" formula="pol0" />
 		
 		<pidCut>1.3</pidCut>
 		<minPairPt>2.2</minPairPt>
@@ -33,8 +33,9 @@
 			<Histo name="ratio_cum" title="(+-)" xtitle="M_{#mu#mu} (GeV/c^{2})" ytitle="pairPID" bins_x="bins.mass" bins_y="bins.spid" />
 			<Histo name="ratio" title="(+-)" xtitle="M_{#mu#mu} (GeV/c^{2})" ytitle="pairPID" bins_x="bins.mass" bins_y="bins.spid" />
 
-			<Histo name="ls" bins_x="bins.mass" />
+			<Histo name="ls" bins_x="bins.massls" />
 			<Histo name="uls" bins_x="bins.massuls" />
+			<Histo name="cfactor" bins_x="bins.mass" />
 
 			<Histo name="mixed_ls" bins_x="bins.mass" bins_y="bins.spid" />
 
@@ -43,16 +44,19 @@
 
 	<bins>
 
-		<!-- <mass>0.0, 0.21, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0</mass> -->
-		<mass min="0.0" max="4.0" width="0.1" />
+		<!-- <mass>0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0, 1.1, 1.2, 1.3, 1.5, 2.0, 3.0, 3.2, 3.4, 3.6, 4.0</mass> -->
+		<mass>0.0, 0.21, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0</mass>
+		<!-- <mass min="0.0" max="4.0" width="0.1" /> -->
+		<!-- <massuls>0.0, 0.21, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0</massuls> -->
 		<massuls min="0.0" max="4.0" width="0.01" />
+		<massls min="0.0" max="4.0" width="0.05" />
 		<!-- <mass>0.0, 0.2, 0.5, 1.0, 3.0, 3.2, 4.0</mass> -->
 		<!-- <mass>0.0, 0.5, 1.0, 3.0</mass> -->
 		<!-- <mass>3.2, 15.0</mass> -->
 
 		<!-- <mass>0.0, 0.21, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0</sigMass> -->
 		<pid min="-0.1" max="1.1" width="0.01" />
-		<spid min="-0.1" max="1.45" width="0.25" />
+		<spid min="-0.1" max="1.45" width="0.05" />
 		
 	</bins>
 

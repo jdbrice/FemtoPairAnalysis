@@ -15,12 +15,16 @@ using namespace jdb;
 #include "DeltaTofPdfs/DeltaTofPdfAna.h"
 #include "DeltaTofPdfs/GeneratePdf.h"
 #include "MixedEventAna.h"
+#include "MixedPidAna.h"
 #include "DcaPdfAna.h"
 #include "SignalMaker.h"
 
 
 #define LOGURU_IMPLEMENTATION 1
 #include "vendor/loguru.h"
+
+
+
 
 int main( int argc, char* argv[] ) {
 	// loguru::add_file("everything.log", loguru::Truncate, loguru::Verbosity_MAX);
@@ -34,6 +38,7 @@ int main( int argc, char* argv[] ) {
 	TaskFactory::registerTaskRunner<GeneratePdf>( "GeneratePdf" );
 	TaskFactory::registerTaskRunner<SignalMaker>( "SignalMaker" );
 	TaskFactory::registerTaskRunner<MixedEventAna>( "MixedEventAna" );
+	TaskFactory::registerTaskRunner<MixedPidAna>( "MixedPidAna" );
 	TaskFactory::registerTaskRunner<DcaPdfAna>( "DcaPdfAna" );
 	
 

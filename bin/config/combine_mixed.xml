@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Data name="d" url="mix_try0/" />
+
+
+	<Data name="duls0" url="mix_try0/mixed_cs0_pid0_.1.root" />
+	<Data name="duls1" url="mix_try0/mixed_cs0_pid.1_.2.root" />
+	<Data name="duls2" url="mix_try0/mixed_cs0_pid.2_.3.root" />
+	<Data name="duls3" url="mix_try0/mixed_cs0_pid.3_.4.root" />
+	<Data name="duls4" url="mix_try0/mixed_cs0_pid.4_.5.root" />
+	<Data name="duls5" url="mix_try0/mixed_cs0_pid.5_.6.root" />
+	<Data name="duls6" url="mix_try0/mixed_cs0_pid.6_.7.root" />
+	<Data name="duls7" url="mix_try0/mixed_cs0_pid.7_.8.root" />
+	<Data name="duls8" url="mix_try0/mixed_cs0_pid.8_.9.root" />
+	<Data name="duls9" url="mix_try0/mixed_cs0_pid.9_1.0.root" />
+	<Data name="duls10" url="mix_try0/mixed_cs0_pid1.0_1.1.root" />
+	<Data name="duls11" url="mix_try0/mixed_cs0_pid1.1_1.2.root" />
+	
+	<Data name="dls0" url="mix_try0/mixed_cs2_pid0_.1.root" />
+	<Data name="dls1" url="mix_try0/mixed_cs2_pid.1_.2.root" />
+	<Data name="dls2" url="mix_try0/mixed_cs2_pid.2_.3.root" />
+	<Data name="dls3" url="mix_try0/mixed_cs2_pid.3_.4.root" />
+	<Data name="dls4" url="mix_try0/mixed_cs2_pid.4_.5.root" />
+	<Data name="dls5" url="mix_try0/mixed_cs2_pid.5_.6.root" />
+	<Data name="dls6" url="mix_try0/mixed_cs2_pid.6_.7.root" />
+	<Data name="dls7" url="mix_try0/mixed_cs2_pid.7_.8.root" />
+	<Data name="dls8" url="mix_try0/mixed_cs2_pid.8_.9.root" />
+	<Data name="dls9" url="mix_try0/mixed_cs2_pid.9_1.0.root" />
+	<Data name="dls10" url="mix_try0/mixed_cs2_pid1.0_1.1.root" />
+	<Data name="dls11" url="mix_try0/mixed_cs2_pid1.1_1.2.root" />
+
+
+	<TFile url="all_mixed.root"/>
+
+	<Transform states="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12">
+		<Clone save_as="uls_data_{state}" name="duls{state}/hs_1_301" setdir="false" />
+		<Clone save_as="uls_mixed_{state}" name="duls{state}/hm_1_301" setdir="false" />
+		<Clone save_as="uls_weighted_{state}" name="duls{state}/hmw_1_301" setdir="false" />
+
+		<Clone save_as="ls_data_{state}" name="dls{state}/hs_1_301" setdir="false" />
+		<Clone save_as="ls_mixed_{state}" name="dls{state}/hm_1_301" setdir="false" />
+		<Clone save_as="ls_weighted_{state}" name="dls{state}/hmw_1_301" setdir="false" />
+	</Transform>
+
+
+</config>

@@ -224,6 +224,26 @@ protected:
 		lv1.SetPtEtaPhiM( pair->d1_mPt, pair->d1_mEta, pair->d1_mPhi, 0.105 );
 		lv2.SetPtEtaPhiM( pair->d2_mPt, pair->d2_mEta, pair->d2_mPhi, 0.105 );
 		lv = lv1 + lv2;
+
+		// PAIR kinematics
+		if ( fabs( lv.Rapidity() ) > 0.5 )
+			return;
+
+		// DAUGHTER kinematics
+		if ( fabs( lv1.PseudoRapidity() ) > 0.5 )
+			return;
+		if ( lv1.Pt() < 0.1 )
+			return;
+		if ( fabs( lv2.PseudoRapidity() ) > 0.5 )
+			return;
+		if ( lv2.Pt() < 0.1 )
+			return;
+
+		// TRIGGER FLAG
+		if ( pair->d1_mTriggerFlag <= 0 )
+			return;
+		if ( pair->d2_mTriggerFlag <= 0 )
+			return;
 		
 
 		float pairPid = sqrt( pow( pair->d1_mPid, 2 ) + pow( pair->d2_mPid, 2 ) );

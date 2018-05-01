@@ -10,10 +10,10 @@
 		<mixN>3</mixN>
 		<step>0.1</step>
 
-		<minPID>0.95</minPID> 
-		<maxPID>0.95</maxPID>
-		<cutPID>0.6</cutPID>
-		<usePairPID>false</usePairPID>
+		<minPID>1.1</minPID> 
+		<maxPID>1.2</maxPID>
+		<cutPID>0.0</cutPID>
+		<usePairPID>true</usePairPID>
 
 	</params>
 

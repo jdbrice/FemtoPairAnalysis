@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="MixedPidAna" type="MixedPidAna" config="" nodePath="MixedPidAna"  />
+
+	<params>
+		<chargeSum>0</chargeSum>
+		<minPt>0</minPt>
+		<maxPt>100.25</maxPt>
+		
+		<mixN>10</mixN>
+		<step>0.1</step>
+
+		<minMass>1.1</minMass> 
+		<maxMass>1.5</maxMass>
+
+		<usePairPID>false</usePairPID>
+
+	</params>
+
+
+	<MixedPidAna nEventLoops="3">
+		<EventLoop progress="true" />
+		
+		<input>
+			<dst treeName="PairDst" url="pair_dst_DNN_N6.root"  maxFiles="10000" />
+		</input>
+
+		<output>
+			<TFile url="pid_mixed_pid{params.minMass}_{params.maxMass}.root" />
+		</output>
+
+		<histograms>
+			<Histo name="uls_same" title="" bins_x="bins.pairPid" lc="#00F" />
+			<Histo name="uls_mix" title="" bins_x="bins.pairPid" lc="#F00" />
+			<Histo name="uls_mixw" title="" bins_x="bins.pairPid" lc="#000" />
+
+			<Histo name="ls_same" title="" bins_x="bins.pairPid" lc="#00F" />
+			<Histo name="ls_mix" title="" bins_x="bins.pairPid" lc="#F00" />
+			<Histo name="ls_mixw" title="" bins_x="bins.pairPid" lc="#000" />
+
+			
+
+			<Histo name="uls_same_deltaPid" bins_x="bins.dpid" lc="#00F" />
+			<Histo name="uls_mix_deltaPid" bins_x="bins.dpid" lc="#F00" />
+			<Histo name="uls_mixw_deltaPid" bins_x="bins.dpid" lc="#000" />
+
+			<Histo name="ls_same_deltaPid" bins_x="bins.dpid" lc="#00F" />
+			<Histo name="ls_mix_deltaPid" bins_x="bins.dpid" lc="#F00" />
+			<Histo name="ls_mixw_deltaPid" bins_x="bins.dpid" lc="#000" />
+
+
+			<Histo name="uls_same_deltaPid_pid" title=";pid_{min}; #Delta pid" bins_x="bins.pid" bins_y="bins.dpid" lc="#00F" />
+			<Histo name="uls_mix_deltaPid_pid" title=";pid_{min}; #Delta pid" bins_x="bins.pid" bins_y="bins.dpid" lc="#F00" />
+			<Histo name="uls_mixw_deltaPid_pid" title=";pid_{min}; #Delta pid" bins_x="bins.pid" bins_y="bins.dpid" lc="#000" />
+
+			<Histo name="ls_same_deltaPid_pid" title=";pid_{min}; #Delta pid" bins_x="bins.pid" bins_y="bins.dpid" lc="#00F" />
+			<Histo name="ls_mix_deltaPid_pid" title=";pid_{min}; #Delta pid" bins_x="bins.pid" bins_y="bins.dpid" lc="#F00" />
+			<Histo name="ls_mixw_deltaPid_pid" title=";pid_{min}; #Delta pid" bins_x="bins.pid" bins_y="bins.dpid" lc="#000" />
+		</histograms>
+	</MixedPidAna>
+
+
+	<bins>
+		<pairPid min="-0.2" max="2.0" width="0.01" />
+		<pid min="-0.2" max="1.0" width="0.025" />
+		<dpid min="0.0" max="1.2" width="0.1" />
+	</bins>
+
+</config>

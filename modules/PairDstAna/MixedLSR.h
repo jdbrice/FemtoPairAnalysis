@@ -60,8 +60,8 @@ public:
 			euls = sqrt( vuls );
 			els = sqrt( vls );
 
-			hlsr->SetBinContent( i+2,  vuls  );
-			hlsr->SetBinError( i+2,  (vuls ) * sqrt( pow(euls / vuls, 2) + pow(els / vls, 2) )  );
+			hlsr->SetBinContent( i+2,  vuls /vls  );
+			hlsr->SetBinError( i+2,  (vuls /vls ) * sqrt( pow(euls / vuls, 2) + pow(els / vls, 2) )  );
 
 			rpl.style( huls_mw ).set("lc", "#000" ).set("draw", "hpe").set("logy", 1).draw();
 			rpl.style( hls_mw ).set("lc", "#F00" ).set("draw", "same hpe").draw();
@@ -87,8 +87,8 @@ public:
 			float vuls = huls->IntegralAndError( xuls->FindBin( m1 ), xuls->FindBin( m2 ), euls );
 			float vls = hls->IntegralAndError( xls->FindBin( m1 ), xls->FindBin( m2 ), els );
 
-			hlsrd->SetBinContent( i+2,  vuls  );
-			hlsrd->SetBinError( i+2,  (vuls ) * sqrt( pow(euls / vuls, 2) + pow(els / vls, 2) )  );
+			hlsrd->SetBinContent( i+2,  vuls / vls );
+			hlsrd->SetBinError( i+2,  (vuls / vls ) * sqrt( pow(euls / vuls, 2) + pow(els / vls, 2) )  );
 
 			rpl.style( huls ).set("lc", "#000" ).set("draw", "hpe").set("logy", 1).draw();
 			rpl.style( hls ).set("lc", "#F00" ).set("draw", "same hpe").draw();
