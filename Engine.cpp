@@ -18,6 +18,9 @@ using namespace jdb;
 #include "MixedPidAna.h"
 #include "DcaPdfAna.h"
 #include "SignalMaker.h"
+#include "JPsi/JPsiHistogram.h"
+#include "JPsi/JPsiMvaHistogram.h"
+#include "JPsi/JPsiFitter.h"
 
 
 #define LOGURU_IMPLEMENTATION 1
@@ -40,6 +43,9 @@ int main( int argc, char* argv[] ) {
 	TaskFactory::registerTaskRunner<MixedEventAna>( "MixedEventAna" );
 	TaskFactory::registerTaskRunner<MixedPidAna>( "MixedPidAna" );
 	TaskFactory::registerTaskRunner<DcaPdfAna>( "DcaPdfAna" );
+	TaskFactory::registerTaskRunner<JPsiHistogram>( "JPsiHistogram" );
+	TaskFactory::registerTaskRunner<JPsiMvaHistogram>( "JPsiMvaHistogram" );
+	TaskFactory::registerTaskRunner<JPsiFitter>( "JPsiFitter" );
 	
 
 	TaskEngine engine( argc, argv, "PairDstAna" );
