@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-cd ../
-scons -j8
-cd bin
-./pico.app config/dtof.xml

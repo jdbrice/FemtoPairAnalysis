@@ -21,7 +21,7 @@ using namespace jdb;
 #include "JPsi/JPsiHistogram.h"
 #include "JPsi/JPsiMvaHistogram.h"
 #include "JPsi/JPsiFitter.h"
-
+#include "ComparePid.h"
 
 #define LOGURU_IMPLEMENTATION 1
 #include "vendor/loguru.h"
@@ -46,6 +46,8 @@ int main( int argc, char* argv[] ) {
 	TaskFactory::registerTaskRunner<JPsiHistogram>( "JPsiHistogram" );
 	TaskFactory::registerTaskRunner<JPsiMvaHistogram>( "JPsiMvaHistogram" );
 	TaskFactory::registerTaskRunner<JPsiFitter>( "JPsiFitter" );
+
+    TaskFactory::registerTaskRunner<ComparePid>( "ComparePid" );
 	
 
 	TaskEngine engine( argc, argv, "PairDstAna" );
