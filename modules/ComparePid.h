@@ -155,6 +155,16 @@ protected:
 
 	} //analyzeEvent
 
+	void scale_content_binwidth( TH1 * h ){
+		assert( nullptr != h );
+		for (size_t i = 1; i <= h->GetXaxis()->GetNbins(); i++){
+			float v = h->GetBinContent( i );
+			float e = h->GetBinError( i );
+			float bw = h->GetBinWidth( i );
+			h->SetBinContent( i, v / bw );
+			h->SetBinError( i, e / bw );
+		}
+	}
 
 	virtual void postMake(){
 		TreeAnalyzer::postMake();
@@ -171,6 +181,10 @@ protected:
 		hmva->Scale( 1.0, "width");
 		htra->Scale( 1.0, "width");
 
+		// this was a sanity checker due to question in PWG
+		// scale_content_binwidth( (TH1*)hmva->Clone( "mva_scaled" ) );
+		// scale_content_binwidth( (TH1*)htra->Clone( "tra_scaled" ) );
+		
 		TAxis *x = hmva->GetXaxis();
 
 		int x1 = x->FindBin( 1.1 );
