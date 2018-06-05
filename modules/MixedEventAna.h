@@ -265,7 +265,7 @@ protected:
 			addToBuffer( to1 );
 			addToBuffer( to2 );
 			
-			if ( lv.Pt() > minPt && lv.Pt() < maxPt ){
+			if ( lv.Pt() > minPt && lv.Pt() < maxPt && lv.M() > 0.0){
 				book->fill( "hsame", lv.M(), lv.Pt() );
 				
 
@@ -436,11 +436,11 @@ protected:
 		TH1 * hmw = hmixw->ProjectionX( TString::Format("hmw_%d_%d", ptBin1, ptBin2 ), ptBin1, ptBin2 );
 
 
-		int hsbin1 = hs->GetXaxis()->FindBin( 2.0 );
-		int hsbin2 = hs->GetXaxis()->FindBin( 2.4 );
+		int hsbin1 = hs->GetXaxis()->FindBin( config.get<float>( "params.norm:min", 2.0 ) );
+		int hsbin2 = hs->GetXaxis()->FindBin( config.get<float>( "params.norm:max", 5.0 ) );
 
-		int hmbin1 = hm->GetXaxis()->FindBin( 2.0 );
-		int hmbin2 = hm->GetXaxis()->FindBin( 2.4 );
+		int hmbin1 = hm->GetXaxis()->FindBin( config.get<float>( "params.norm:min", 2.0 ) );
+		int hmbin2 = hm->GetXaxis()->FindBin( config.get<float>( "params.norm:max", 5.0 ) );
 
 		float hmbw = hm->GetBinWidth( 10 );
 		float hsbw = hs->GetBinWidth( 10 );
@@ -457,11 +457,11 @@ protected:
 		hm->Scale( hsbw / hmbw  );
 
 
-		hmbin1 = hm->GetXaxis()->FindBin( 0.3 );
-		hmbin2 = hm->GetXaxis()->FindBin( 4.0 );
+		hmbin1 = hm->GetXaxis()->FindBin( config.get<float>( "params.weightedNorm:min", 0.2 ) );
+		hmbin2 = hm->GetXaxis()->FindBin( config.get<float>( "params.weightedNorm:max", 4.0 ) );
 
-		hsbin1 = hs->GetXaxis()->FindBin( 0.3 );
-		hsbin2 = hs->GetXaxis()->FindBin( 4.0 );
+		hsbin1 = hs->GetXaxis()->FindBin( config.get<float>( "params.weightedNorm:min", 0.2 ) );
+		hsbin2 = hs->GetXaxis()->FindBin( config.get<float>( "params.weightedNorm:max", 4.0 ) );
 
 		Ihs = hs->Integral( hsbin1, hsbin2 );
 		float Ihmw = hmw->Integral( hmbin1, hmbin2 );
@@ -476,7 +476,7 @@ protected:
 		hm->Draw("same hpe");
 		hmw->Draw("same hpe");
 		
-		gPad->SetLogy(0);
+		gPad->SetLogy(1);
 		can->Print( rpName.c_str() );
 
 
