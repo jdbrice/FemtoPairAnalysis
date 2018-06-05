@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<Task name="LikeSignRatioAna" type="LikeSignRatioAna" config="" nodePath="LSR"  />
+	<sys>pp</sys>
+	<mod>DNN_N6</mod>
 
 	<p>
 		<fit min="0.0" max="1.2" formula="pol0" />
 		
-		<pidCut>1.3</pidCut>
-		<minPairPt>2.2</minPairPt>
+		<pidCut>1.35</pidCut>
+		<minPairPt>0</minPairPt>
 		<maxPairPt>1000</maxPairPt>
 		<cum>false</cum>
 	</p>
@@ -17,11 +19,11 @@
 			<!-- <dst treeName="PairDst" url="/Users/jdb/bnl/local/data/sandbox/auau_20_40_pair_dst.root"  maxFiles="-1" nEvents="-1" /> -->
 			<!-- <dst treeName="PairDst" url="/Users/jdb/bnl/local/data/sandbox/auau_40_60_pair_dst.root"  maxFiles="-1" nEvents="-1" /> -->
 			<!-- <dst treeName="PairDst" url="/Users/jdb/bnl/local/data/sandbox/auau_60_80_pair_dst.root"  maxFiles="-1" nEvents="-1" /> -->
-			<dst treeName="PairDst" url="pair_dst_DNN_N6.root" maxFiles="-1" nEvents="-1" />
+			<dst treeName="PairDst" url="{DIMUON_ROOT}/data/PairDst/pair_dst_{sys}_{mod}.root"   />
 		</input>
 
 		<output>
-			<TFile url="lsr.root" />
+			<TFile url="raw-{sys}-{mod}.root" />
 		</output>
 
 		<histograms>
@@ -45,11 +47,11 @@
 	<bins>
 
 		<!-- <mass>0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0, 1.1, 1.2, 1.3, 1.5, 2.0, 3.0, 3.2, 3.4, 3.6, 4.0</mass> -->
-		<mass>0.0, 0.21, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0</mass>
+		<mass>0.0, 0.21, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0, 4.5, 5.0, 5.5, 6.0</mass>
 		<!-- <mass min="0.0" max="4.0" width="0.1" /> -->
 		<!-- <massuls>0.0, 0.21, 0.3, 0.4, 0.53, 0.56, 0.7, 0.76, 0.78, 0.8, 0.97, 1.0, 1.02, 1.04, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0</massuls> -->
-		<massuls min="0.0" max="4.0" width="0.01" />
-		<massls min="0.0" max="4.0" width="0.05" />
+		<massuls min="0.0" max="6.0" width="0.01" />
+		<massls min="0.0" max="6.0" width="0.01" />
 		<!-- <mass>0.0, 0.2, 0.5, 1.0, 3.0, 3.2, 4.0</mass> -->
 		<!-- <mass>0.0, 0.5, 1.0, 3.0</mass> -->
 		<!-- <mass>3.2, 15.0</mass> -->

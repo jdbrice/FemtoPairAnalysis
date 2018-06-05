@@ -18,6 +18,7 @@ using namespace jdb;
 #include "MixedPidAna.h"
 #include "DcaPdfAna.h"
 #include "SignalMaker.h"
+#include "BackgroundMaker.h"
 #include "JPsi/JPsiHistogram.h"
 #include "JPsi/JPsiMvaHistogram.h"
 #include "JPsi/JPsiFitter.h"
@@ -40,6 +41,7 @@ int main( int argc, char* argv[] ) {
 	TaskFactory::registerTaskRunner<DeltaTofPdfAna>( "DeltaTofPdfAna" );
 	TaskFactory::registerTaskRunner<GeneratePdf>( "GeneratePdf" );
 	TaskFactory::registerTaskRunner<SignalMaker>( "SignalMaker" );
+	TaskFactory::registerTaskRunner<BackgroundMaker>( "BackgroundMaker" );
 	TaskFactory::registerTaskRunner<MixedEventAna>( "MixedEventAna" );
 	TaskFactory::registerTaskRunner<MixedPidAna>( "MixedPidAna" );
 	TaskFactory::registerTaskRunner<DcaPdfAna>( "DcaPdfAna" );

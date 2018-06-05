@@ -56,11 +56,11 @@ protected:
 		// DAUGHTER kinematics
 		if ( fabs( lv1.PseudoRapidity() ) > 0.5 )
 			return;
-		if ( lv1.Pt() < 0.1 )
+		if ( lv1.Pt() < 1.1 )
 			return;
 		if ( fabs( lv2.PseudoRapidity() ) > 0.5 )
 			return;
-		if ( lv2.Pt() < 0.1 )
+		if ( lv2.Pt() < 1.1 )
 			return;
 
 		// TRIGGER FLAG
