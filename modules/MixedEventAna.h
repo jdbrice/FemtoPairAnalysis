@@ -150,7 +150,9 @@ public:
 		LOG_F( INFO, "PID = ( %f, %f)", MIN_PID, MAX_PID );
 		LOG_F( INFO, "mixN=%lu", mixN );
 
-		rpName = string(TString::Format( "rpMixed_cs%d_pid%f_%f.pdf", chargeSum, MIN_PID, MAX_PID ).Data());
+		string sys = config.get<string>("sys");
+		string mod = config.get<string>("mod");
+		rpName = string(TString::Format( "rpMixed_%s_%s_cs%d_pid%f_%f.pdf", sys.c_str(), mod.c_str(), chargeSum, MIN_PID, MAX_PID ).Data());
 
 	}
 
@@ -232,11 +234,11 @@ protected:
 		// DAUGHTER kinematics
 		if ( fabs( lv1.PseudoRapidity() ) > 0.5 )
 			return;
-		if ( lv1.Pt() < 0.1 )
+		if ( lv1.Pt() < 1.1 )
 			return;
 		if ( fabs( lv2.PseudoRapidity() ) > 0.5 )
 			return;
-		if ( lv2.Pt() < 0.1 )
+		if ( lv2.Pt() < 1.1 )
 			return;
 
 		// TRIGGER FLAG
