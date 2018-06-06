@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="MixedEventAna" type="MixedEventAna" config="" nodePath="MixedEventAna"  />
+
+
+	<sys>pp</sys>
+	<mod>DNN_N6</mod>
+
+
+	<params>
+		<chargeSum>0</chargeSum>
+		<minPt>0</minPt>
+		<maxPt>100.25</maxPt>
+		<weights>same_pt_angle, mix_pt_angle, same_dEta_dPhi, mix_dEta_dPhi, mixwa_pt_angle, mixwb_pt_angle, mixw_dEta_dPhi</weights>
+		<mixN>3</mixN>
+		<step>0.1</step>
+
+		<minPID>1.35</minPID> 
+		<maxPID>1.5</maxPID>
+		<cutPID>0.0</cutPID>
+		<usePairPID>true</usePairPID>
+
+	</params>
+
+
+	<MixedEventAna nEventLoops="3">
+		<EventLoop progress="true" />
+		<input>
+			<dst treeName="PairDst" url="{DIMUON_ROOT}/data/PairDst/pair_dst_{sys}_{mod}.root"  maxFiles="10000" />
+		</input>
+
+		<output>
+			<TFile url="mixed_{sys}_{mod}_cs{params.chargeSum}_pid{params.minPID}_{params.maxPID}-k0s.root" />
+		</output>
+
+		<histograms>
+			<Histo name="hsame" title="" bins_x="bins.mass" bins_y="bins.pt" />
+			<Histo name="hmix" title="" bins_x="bins.mix_mass" bins_y="bins.pt" />
+			<Histo name="hmixw" title="" bins_x="bins.mix_mass" bins_y="bins.pt" />
+
+
+			<Histo name="same_pt" title="" bins_x="bins.pt" />
+			<Histo name="same_eta" title="" bins_x="bins.eta" />
+			<Histo name="same_phi" title="" bins_x="bins.phi" />
+			<Histo name="same_dCell" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+			<Histo name="same_dMod" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+			<Histo name="same_dBL" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+
+			<!-- <Histo name="same_dY" title="" bins_x="bins.dY" /> -->
+
+			<Histo name="mix_pt" title="" bins_x="bins.pt" />
+			<Histo name="mix_eta" title="" bins_x="bins.eta" />
+			<Histo name="mix_phi" title="" bins_x="bins.phi" />
+			<Histo name="mix_dCell" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+			<Histo name="mix_dMod" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+			<Histo name="mix_dBL" title="" bins_x="bins.dCell" bins_y="bins.mass"/>
+
+			<Histo name="mix_dEta_dPhi" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" />
+			
+			<Histo name="same_dEta_dPhi" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" />
+
+			<Histo name="same_pt_angle" bins_x="bins.angle" bins_y="bins.pt" />
+			<Histo name="mix_pt_angle" bins_x="bins.angle" bins_y="bins.pt" />
+			
+			<Histo name="mixw_dEta_dPhi" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" />
+			<Histo name="mixwa_pt_angle" bins_x="bins.angle" bins_y="bins.pt" />
+			<Histo name="mixwb_pt_angle" bins_x="bins.angle" bins_y="bins.pt" />
+
+			<!-- <Histo name="mix_d_dY" title="" bins_x="bins.dY" /> -->
+
+
+			<Histo name="map_hit" title="" bins_x="bins.hit" bins_y="bins.hit" />
+			<Histo name="dEta_dPhi" title=";dPhi;dEta" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" />
+			<Histo name="pt_dEta" bins_x="bins.deltaEta" bins_y="bins.pt" />
+			<Histo name="pt_dPhi" bins_x="bins.deltaPhi" bins_y="bins.pt" />
+			<Histo name="pt_dBL" bins_x="bins.dCell" bins_y="bins.pt" />
+
+			<Histo name="pt_dEta_dPhi" bins_x="bins.deltaPhi" bins_y="bins.deltaEta" bins_z="bins.pt" />
+			<Histo name="pt_dpt" bins_x="bins.pt" bins_y="bins.pt" />
+			<Histo name="pt_hit_map" bins_x="bins.hit" bins_y="bins.hit" bins_z="bins.pt2" />
+
+		</histograms>
+	</MixedEventAna>
+
+
+	<bins>
+		<mass min="0" max="1.0" width="0.01" />
+		<mix_mass min="0" max="1.0" width="0.01" />
+		<mass_ratio min="0" max="1.0" width="0.1" />
+		
+		<pt2 min="0" max="15" width="10" />
+		<pid min="-0.1" max="1.1" width="0.01" />
+
+		<deltaEta min="0" max="1" width="0.025" />
+		<!-- larger bins do not work well -->
+		<deltaEta> 0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.6, 1.0</deltaEta>
+		<deltaPhi min="0" max="3.2" width="0.01" />
+
+		<pt min="0" max="15" width="0.05" />
+		<eta min="-0.8" max="0.8" width="0.05" />
+		<phi min="-3.2" max="3.2" width="0.01" />
+		<angle min="0" max="3.2" width="0.05" />
+		<dY min="-70" max="70" width="1" />
+
+		<hit min="0" max="1800" width="1" />
+		<dCell min="0" max="30" width="1" />
+	</bins>
+
+</config>
