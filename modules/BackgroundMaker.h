@@ -105,6 +105,36 @@ public:
 		}
 	}
 
+
+	virtual void draw_cocktail(){
+		// get the 2D histograms
+		map<string,TH2 * > h2d;
+		map<string,TH1 * > h1d;
+
+		RooPlotLib rpl;
+		vector<string> components = { "eta_mumu", "ccbar_mumu", "jpsi_mumu", "omega_mumu", "omega_pi0mumu", "rho_mumu", "phi_mumu", "eta_gammamumu", "etaprime_gammamumu" };
+		for ( string n : components ){
+			h2d[ n ] = get<TH2>( "Scaled_pT_" + n );
+			LOG_F( INFO, "Cocktail: %s", n.c_str()  );
+			h1d[ n ] = h2d[ n ]->ProjectionX( (n + "_mass"/*, ipt1, ipt2*/).c_str() );
+			if ( n == "eta_mumu" ){
+				h1d[ "sum" ] = (TH1*)h1d[ n ]->Clone( "cocktail_sum" );
+				h1d[ "sum" ]->Reset();
+			}
+			if ( n != "ccbar_mumu" ){
+				h1d[ n ]->Scale( 3.5e11 * config.get<float>( "p.eff", 1.0 ), "width" );
+			} else {
+				h1d[ n ]->Scale( 3.5e11 * config.get<float>( "p.eff", 1.0 ) );
+			}
+			h1d[ "sum" ]->Add( h1d[ n ] );
+
+			rpl.style( h1d[ n ] ).set( config, "style.cocktail" ).set( config, "style.cocktail_" + n ).draw("same");
+		}
+
+		rpl.style( h1d["sum"] ).set( config, "style.cocktail" ).set( config, "style.cocktail_sum" ).draw( "same" );
+
+	}
+
 	virtual void make(){
 		LOG_F( INFO, "" );
 		gStyle->SetOptStat(0);
@@ -116,6 +146,9 @@ public:
 		TH1 * hraw_mix  = get<TH1>( config.get<string>("p.mixedName"), "mixed" );
 
 		TH1 * hraw_corr = get<TH1>( "R_mass", "corr" );
+
+		hraw_uls->Sumw2();
+		hraw_ls->Sumw2();
 
 		assert( hraw_uls );
 		assert( hraw_ls );
@@ -135,7 +168,12 @@ public:
 
 		avg_binning( hraw_corr, hrb_corr );
 
-		TH1 * hraw_bg = (TH1*)hraw_mix->Clone( "raw_bg" );
+		TH1 * hraw_bg = nullptr;
+		if ( config.get<string>( "p.bgsource", "mix" ) == "ls" ){
+			hraw_bg = (TH1*)hraw_ls->Clone( "raw_bg" );
+		} else {
+			hraw_bg = (TH1*)hraw_mix->Clone( "raw_bg" );
+		}
 
 		for ( size_t i = 1; i < hraw_bg->GetXaxis()->GetNbins(); i++ ){
 			float x  = hraw_bg->GetBinCenter( i );
@@ -154,7 +192,13 @@ public:
 		RooPlotLib rpl;
 		rpl.link( book );
 
-		rpl.style( hrb_ls ).set( config, "style.ls" ).draw();
+
+		hraw_ls->Scale( 1.0, "width" );
+		hraw_mix->Scale( 1.0, "width" );
+
+		rpl.style( hraw_ls ).set( config, "style.ls" ).draw();
+		rpl.style( hrb_ls ).set( config, "style.ls" ).draw("same");
+		rpl.style( hraw_mix ).set( config, "style.mixed" ).draw("same");
 		rpl.style( hrb_mix ).set( config, "style.mixed" ).draw("same");
 
 		rp.next();
@@ -167,7 +211,7 @@ public:
 
 		rp.next();
 
-		hraw_mix->Scale(1.0, "width" );
+		// hraw_mix->Scale(1.0, "width" );
 		hraw_bg->Scale(1.0, "width" );
 
 		vector<float> legPos = config.getFloatVector( "TLegend[0]:pos" );
@@ -258,7 +302,7 @@ public:
 
 		rp.next();
 
-		rpl.style( hraw_uls ).set( config, "style.uls" ).draw();
+		rpl.style( hraw_uls ).set( config, "style.uls" ).set( "min", 1 ).draw();
 		rpl.style( hrb_uls ).set( config, "style.uls" ).draw("same");
 		rpl.style( hraw_bg ).set( config, "style.bg" ).draw("same");
 		rpl.style( hrb_bg ).set( config, "style.bg" ).draw("same");
@@ -276,6 +320,28 @@ public:
 
 		rp.next();
 
+
+		// Draw with the Cocktail
+		// 
+		rpl.style( hraw_uls ).set( config, "style.uls" ).set( "min", 10 ).draw();
+		rpl.style( hrb_uls ).set( config, "style.uls" ).draw("same");
+		rpl.style( hraw_bg ).set( config, "style.bg" ).draw("same");
+		rpl.style( hrb_bg ).set( config, "style.bg" ).draw("same");
+		rpl.style( hraw_mix ).set( config, "style.mixed" ).draw("same");
+		rpl.style( hrb_mix ).set( config, "style.mixed" ).draw("same");
+		// rpl.style( hraw_sig ).set( config, "style.sig" ).draw("same");
+		rpl.style( hrb_sig ).set( config, "style.sig" ).draw("same");
+
+		draw_cocktail();
+
+		gPad->SetLogy(1);
+
+		leg0->Draw("same");
+
+		lx.DrawLatexNDC( 0.6, 0.9, TString::Format( "Run15 %s at #sqrt{s} = 200 GeV", config["sys"].c_str() ) );
+		lx.DrawLatexNDC( 0.2, 0.90, "p_{T}^{#mu} > 1.1 (GeV/c), |#eta^{#mu}| < 0.5" );
+		lx.DrawLatexNDC( 0.2, 0.85, "p_{T}^{#mu#mu} > 0.0 (GeV/c), |y_{#mu#mu}| < 0.5" );
+		rp.next();
 
 
 	}
