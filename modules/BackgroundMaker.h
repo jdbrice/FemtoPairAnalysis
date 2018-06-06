@@ -147,7 +147,7 @@ public:
 		TH1 * hrb_bg = HistoBins::rebin1D( "rb_bg", hraw_bg, bins["mass"] );
 		hrb_bg->Scale( 1.0, "width" );
 
-		Reporter rp( "rpBackground-" + config["sys"] + "-" + config["mod"] + ".pdf", 1900, 1200 );
+		Reporter rp( "rpBackground-" + config["sys"] + "-" + config["mod"] + config["debug"] + ".pdf", 1900, 1200 );
 		rp.newPage();
 		rp.margins( 0.05, 0.02, 0.13, 0.12 );
 

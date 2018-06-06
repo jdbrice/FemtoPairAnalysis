@@ -16,9 +16,6 @@
 	<LSR>
 		<EventLoop progress="true" />
 		<input>
-			<!-- <dst treeName="PairDst" url="/Users/jdb/bnl/local/data/sandbox/auau_20_40_pair_dst.root"  maxFiles="-1" nEvents="-1" /> -->
-			<!-- <dst treeName="PairDst" url="/Users/jdb/bnl/local/data/sandbox/auau_40_60_pair_dst.root"  maxFiles="-1" nEvents="-1" /> -->
-			<!-- <dst treeName="PairDst" url="/Users/jdb/bnl/local/data/sandbox/auau_60_80_pair_dst.root"  maxFiles="-1" nEvents="-1" /> -->
 			<dst treeName="PairDst" url="{DIMUON_ROOT}/data/PairDst/pair_dst_{sys}_{mod}.root"   />
 		</input>
 
@@ -40,6 +37,9 @@
 			<Histo name="cfactor" bins_x="bins.mass" />
 
 			<Histo name="mixed_ls" bins_x="bins.mass" bins_y="bins.spid" />
+
+			<Histo name="all_uls" bins_x="bins.massuls" />
+			<Histo name="all_ls" bins_x="bins.massls" />
 
 		</histograms>
 	</LSR>

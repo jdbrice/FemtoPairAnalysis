@@ -90,6 +90,12 @@ protected:
 		// if ( pidMin < 0.2 )
 		// 	return;
 
+		if ( 0 != pair->mChargeSum ){
+			book->fill( "all_ls", lv.M() );
+		} else if ( 0 == pair->mChargeSum ){
+			book->fill( "all_uls", lv.M() );
+		}
+
 
 		if ( pairPid > pidCut ){
 			if ( 0 != pair->mChargeSum ){
