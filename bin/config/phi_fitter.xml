@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="PhiFitter" type="PhiFitter" config="" nodePath="PhiFitter"  />
+	<mod></mod>
+	<name></name>
+
+
+
+	<p>
+		<pt1>0.0</pt1>
+		<pt2>15.0</pt2>
+
+		<!-- phi or omega -->
+		<reso>phi</reso>
+		<rmls>false</rmls>
+	</p>
+
+	
+	<PhiFitter>
+		<input>
+			<TFile url="phi_histograms{name}.root" />
+		</input>
+		<output>
+			<TFile url="phi_fit{name}.root" />
+		</output>
+	</PhiFitter>
+
+
+	<bins>
+		<!-- USED To Rebin MASS before fitting -->
+		<mass min="0.2" max="1.8" width="0.01" />
+		
+	</bins>
+
+	<style>
+		<mass xr="0.2, 1.5" min="0" xticks="505" draw="h pe" axis-digits="3" y-title=" dN/dM (GeV/c^{2})^{-1} [10 MeV] " yto="1.2" />
+		<fit linewidth="2" />
+		<fitext line-width="2" line-style="2" line-color="#F00" />
+	</style>
+
+
+</config>
