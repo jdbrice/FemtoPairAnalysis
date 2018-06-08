@@ -7,8 +7,8 @@
 	<p>
 		<fit min="0.0" max="1.2" formula="pol0" />
 		
-		<pidCut>1.35</pidCut>
-		<minPairPt>0</minPairPt>
+		<pidCut>1.0</pidCut>
+		<minPairPt>2.2</minPairPt>
 		<maxPairPt>1000</maxPairPt>
 		<cum>false</cum>
 	</p>
@@ -20,7 +20,7 @@
 		</input>
 
 		<output>
-			<TFile url="raw-{sys}-{mod}.root" />
+			<TFile url="raw-{sys}-{mod}-pid{p.pidCut}-minPt{p.minPairPt}.root" />
 		</output>
 
 		<histograms>

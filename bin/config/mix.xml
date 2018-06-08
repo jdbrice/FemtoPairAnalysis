@@ -9,7 +9,7 @@
 
 	<params>
 		<chargeSum>2</chargeSum>
-		<minPt>0</minPt>
+		<minPt>2.2</minPt>
 		<maxPt>100.25</maxPt>
 		<weights>same_pt_angle, mix_pt_angle, same_dEta_dPhi, mix_dEta_dPhi, mixwa_pt_angle, mixwb_pt_angle, mixw_dEta_dPhi</weights>
 		<mixN>3</mixN>
@@ -37,7 +37,7 @@
 		</input>
 
 		<output>
-			<TFile url="mixed_{sys}_{mod}_cs{params.chargeSum}_pid{params.minPID}_{params.maxPID}.root" />
+			<TFile url="mixed_{sys}_{mod}_cs{params.chargeSum}_pid{params.minPID}_{params.maxPID}_pT{params.minPt}_{params.maxPt}.root" />
 		</output>
 
 		<histograms>
