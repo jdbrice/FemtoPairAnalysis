@@ -9,16 +9,22 @@
 
 	<params>
 		<chargeSum>2</chargeSum>
-		<minPt>0</minPt>
+		<minPt>2.2</minPt>
 		<maxPt>100.25</maxPt>
 		<weights>same_pt_angle, mix_pt_angle, same_dEta_dPhi, mix_dEta_dPhi, mixwa_pt_angle, mixwb_pt_angle, mixw_dEta_dPhi</weights>
 		<mixN>3</mixN>
 		<step>0.1</step>
 
-		<minPID>1.35</minPID> 
+		<minPID>1.0</minPID> 
 		<maxPID>1.5</maxPID>
 		<cutPID>0.0</cutPID>
 		<usePairPID>true</usePairPID>
+
+		<norm min="4.0" max="6.0" />
+		<weightedNorm min="0.2" max="6.0" />
+
+		<!-- <norm min="8.0" max="12.0" /> -->
+		<!-- <weightedNorm min="8.0" max="12.0" /> -->
 
 	</params>
 
@@ -31,7 +37,7 @@
 		</input>
 
 		<output>
-			<TFile url="mixed_{sys}_{mod}_cs{params.chargeSum}_pid{params.minPID}_{params.maxPID}.root" />
+			<TFile url="mixed_{sys}_{mod}_cs{params.chargeSum}_pid{params.minPID}_{params.maxPID}_pT{params.minPt}_{params.maxPt}.root" />
 		</output>
 
 		<histograms>
@@ -85,6 +91,7 @@
 
 
 	<bins>
+
 		<mass min="0" max="6" width="0.05" />
 		<mix_mass min="0" max="6" width="0.01" />
 		<mass_ratio min="0" max="6" width="0.1" />
