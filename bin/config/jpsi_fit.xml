@@ -4,8 +4,8 @@
 	<mod></mod>
 
 	<p>
-		<pt1>0</pt1>
-		<pt2>150.0</pt2>
+		<pt1>0.0</pt1>
+		<pt2>15.0</pt2>
 	</p>
 
 	
@@ -21,12 +21,12 @@
 
 	<bins>
 		<!-- USED To Rebin MASS before fitting -->
-		<mass min="2.5" max="4.5" width="0.020" />
+		<mass min="2.4" max="4.5" width="0.040" />
 		
 	</bins>
 
 	<style>
-		<mass xr="2.5, 4.4" min="0" xticks="505" draw="h pe" />
+		<mass xr="2.4, 4.4" min="0" xticks="505" draw="h pe" />
 		<fit linewidth="2" />
 	</style>
 

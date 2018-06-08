@@ -15,7 +15,7 @@ bool rejectPsi2S = true;
 
 Double_t evaluate(Double_t *x, Double_t *p){
 	
-	if ( rejectPsi2S &&  x[0] > 3.686 - 0.2 && x[0] < 3.686 + 0.2 ){
+	if ( rejectPsi2S &&  x[0] > 3.6 && x[0] < 3.8 ){
 		TF1::RejectPoint();
 		return 0;
 	}
@@ -101,6 +101,8 @@ public:
 										sigMassBins.bins.data() 
 									);
 
+		hmassrb->Scale( 1.0, "width" );
+
 		TF1 * f = new TF1( "jpsif", evaluate, 2, 5, 9 );
 		rpl.style( f ).set( config, "style.fit" );
 		f->SetLineColor(kBlack);
@@ -110,7 +112,7 @@ public:
 		f->SetParameter( 11, 0.5 );
 		f->SetNpx( 500 );
 
-		f->SetParLimits( 6, 0, 10000 );
+		f->SetParLimits( 6, 0, 1e9 );
 		f->SetParLimits( 7, 2.9, 3.3);
 		f->SetParLimits( 8, 0.01, 0.1 );
 
@@ -145,11 +147,12 @@ public:
 		fpol->SetRange( 2.5, 4.5 );
 		fpol->Draw("same");
 
-		double Ns = f->Integral( 2.9, 3.3 );
-		double Nbg = fpol->Integral( 2.9, 3.3 );
+		// float bw = hmassrb->GetBinWidth( 5 );
+		double Ns = f->Integral( 2.9, 3.3 ) ;
+		double Nbg = fpol->Integral( 2.9, 3.3 ) ;
 
-		Ns *= 1.0/ hmassrb->GetBinWidth(4);
-		Nbg *= 1.0/ hmassrb->GetBinWidth(4);
+		// Ns *= 1.0/ hmassrb->GetBinWidth(4);
+		// Nbg *= 1.0/ hmassrb->GetBinWidth(4);
 
 		LOG_F( INFO, "Ns=%f", Ns );
 		LOG_F( INFO, "Nbg=%f", Nbg );

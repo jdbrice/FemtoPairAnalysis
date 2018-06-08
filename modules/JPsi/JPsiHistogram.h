@@ -109,11 +109,11 @@ protected:
 		if ( pair->d1_mDCA > 3.0 || pair->d2_mDCA > 3.0 )
 			return;
 
-		if ( fabs(pair->d1_mEta) > 0.5 || fabs(pair->d2_mEta) > 0.5 )
-			return;
-		if ( fabs(lv.Rapidity()) > 0.5 )
-			return;
-		if ( fabs( pair->d1_mDeltaTimeOfFlight ) > 0.3 || fabs( pair->d2_mDeltaTimeOfFlight ) > 0.3 )
+		// if ( fabs(pair->d1_mEta) > 0.5 || fabs(pair->d2_mEta) > 0.5 )
+		// 	return;
+		// if ( fabs(lv.Rapidity()) > 0.5 )
+		// 	return;
+		if ( fabs( pair->d1_mDeltaTimeOfFlight ) > 1.0 || fabs( pair->d2_mDeltaTimeOfFlight ) > 1.0 )
 			return;
 
 		////////////////////////////////////////////////////////////////////////

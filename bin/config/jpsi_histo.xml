@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<Task name="JPsiHistogram" type="JPsiHistogram" config="" nodePath="JPsiHistogram"  />
-	<mod></mod>
+	<sys>pp</sys>
+	<mod>DNN_N6</mod>
 
 
 	<p>
@@ -13,7 +14,7 @@
 		<EventLoop progress="true" />
 		
 		<input>
-			<dst treeName="PairDst" url="pair_dst_charge.root"  maxFiles="-1" />
+			<dst treeName="PairDst" url="{DIMUON_ROOT}/data/PairDst/pair_dst_{sys}_{mod}.root"  maxFiles="-1" />
 		</input>
 
 		<output>
@@ -27,7 +28,7 @@
 
 
 	<bins>
-		<mass min="2.5" max="4.5" width="0.005" />
+		<mass min="2.3" max="4.5" width="0.005" />
 		<pt min="0" max="15.0" width="0.005" />
 	</bins>
 
