@@ -106,7 +106,7 @@ public:
 		rpl.style( f ).set( config, "style.fit" );
 		f->SetLineColor(kBlack);
 		
-		float mu = 1.05;
+		float mu = 1.013;
 		if ( "omega" == resoStr ){
 			mu = 0.78;
 		} else if ( "k0s" == resoStr ){
@@ -119,12 +119,12 @@ public:
 
 		f->SetParLimits( 6, 0, 1e9 );
 		f->SetParLimits( 7, mu - 0.1, mu + 0.1);
-		f->SetParLimits( 8, 0.01, 0.1 );
+		f->SetParLimits( 8, 0.001, 0.06 );
 
 		rpl.style( hmassrb ).set( config, "style.mass" ).draw();
 		
 		float fmin = 0.85;
-		float fmax = 1.3;
+		float fmax = 1.5;
 
 		if ( "omega" == resoStr ){
 			fmin = 0.55;
@@ -169,6 +169,9 @@ public:
 		double Ns = f->Integral( fmu - 3*fsig, fmu + 3*fsig ) ;
 		double Nbg = phi_fpol->Integral( fmu - 3*fsig, fmu + 3*fsig ) ;
 
+		double Nse = f->IntegralError( fmu - 3*fsig, fmu + 3*fsig ) ;
+		double Nbge = phi_fpol->IntegralError( fmu - 3*fsig, fmu + 3*fsig ) ;
+
 		// Ns *= 1.0/ hmassrb->GetBinWidth(4);
 		// Nbg *= 1.0/ hmassrb->GetBinWidth(4);
 
@@ -177,6 +180,7 @@ public:
 
 
 		Ns = Ns - Nbg;
+		Nse = Nse + Nbge;
 
 		LOG_F( INFO, "Ns-Nbg=%f", Ns );
 		
@@ -185,7 +189,7 @@ public:
 		TLatex lx;
 		lx.SetTextSize( 12.0 / 380.0);
 		lx.DrawLatexNDC( .18, 0.9, TString::Format("%0.2f < p_{T} < %0.2f (GeV/c)", pt1, pt2) );
-		lx.DrawLatexNDC( .18, 0.85, TString::Format("N_{#phi}^{raw}=%0.3f", Ns) );
+		lx.DrawLatexNDC( .18, 0.85, TString::Format("N_{#phi}^{raw}=%0.3f #pm %0.3f #pm %0.3f", Ns, sqrt(Ns), Nse) );
 		lx.DrawLatexNDC( .18, 0.8, TString::Format("S/B=%0.3f", Ns/Nbg) );
 		lx.DrawLatexNDC( .18, 0.75, TString::Format("S/#sqrt{S + B}=%0.3f", sig) );
 
@@ -197,6 +201,26 @@ public:
 
 		rp.savePage();
 
+		float mpt = (pt1 + pt2)/2.0;
+		if ( true == config.get<bool>( "p.stepMinOnly", false ) )
+			mpt = pt1 + 1e-5;
+		if ( book->get( "yield" ) ){
+			int ibin = book->get("yield")->GetXaxis()->FindBin( mpt );
+			book->setBin( "yield", ibin, Ns, sqrt(Ns) );
+		}
+		if ( book->get( "mass" ) ){
+			int ibin = book->get("mass")->GetXaxis()->FindBin( mpt );
+			book->get("mass")->SetBinContent( ibin, f->GetParameter( 7 ) );
+			book->get("mass")->SetBinError( ibin, f->GetParError( 7 ) );
+			
+		}
+		if ( book->get( "width" ) ){
+			int ibin = book->get("width")->GetXaxis()->FindBin( mpt );
+			book->get("width")->SetBinContent( ibin, f->GetParameter( 8 ) );
+			book->get("width")->SetBinError( ibin, f->GetParError( 8 ) );
+			
+		}
+
 
 		f->Write();
 	}
@@ -204,7 +228,51 @@ public:
 	virtual void make(){
 		LOG_F( INFO, "" );
 
-		phiFit();
+		book->cd();
+		book->makeAll( nodePath + ".histograms" );
+
+		for ( string n : {"mass", "width", "yield"} ){
+			if ( book->get(n) )
+				book->get(n)->Sumw2();
+		}
+
+		HistoBins fit_bins( config, "bins.fit" );
+		LOG_F( INFO, "Found %d slices to fit", fit_bins.nBins() );
+		for ( size_t i = 0; i < fit_bins.nBins(); i++ ){
+			LOG_F( INFO, "fit %lu", i );
+			float pt1 = fit_bins.getBins()[i];
+			float pt2 = fit_bins.getBins()[i+1];
+			LOG_F( INFO, "Setting fit y=(%f, %f)", pt1, pt2 );
+
+			config.set( "p.pt1", ts(pt1) );
+			if ( false == config.get<bool>( "p.stepMinOnly", false ) )
+				config.set( "p.pt2", ts(pt2) );
+
+			phiFit();
+		}
+	}
+
+	virtual void postMake(){
+		
+		Reporter rp( "yield_phi_summary.pdf", 1600, 800 );
+		rp.margins( 0.03, 0.05, 0.15, 0.15 );
+		rp.newPage();
+
+		RooPlotLib rpl;
+		rpl.link( book );
+		rpl.link( &config );
+
+		if ( book->get( "yield" ) ){
+			book->get( "yield" )->Scale( 1.0, "width" );
+			rpl.style( "yield" ).set( "style.yield" ).draw();
+			gPad->SetLogy(1);
+			rp.next();
+		}
+		gPad->SetLogy(0);
+		rpl.style( "mass" ).set( "style.massfit" ).draw();
+		rp.next();
+		rpl.style( "width" ).set( "style.width" ).draw();
+		rp.savePage();
 	}
 
 };

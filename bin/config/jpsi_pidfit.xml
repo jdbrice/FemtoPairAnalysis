@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="JPsiFitter" type="JPsiFitter" config="" nodePath="JPsiFitter"  />
+	<mod></mod>
+
+	<p>
+		<pt1>0.0</pt1>
+		<pt2>1.50</pt2>
+	</p>
+
+	
+	<JPsiFitter>
+		<input>
+			<TFile url="jpsi_histograms.root" />
+		</input>
+		<output>
+			<TFile url="jpsi_pidfit_pid{p.pt1}_{p.pt2}.root" />
+		</output>
+	</JPsiFitter>
+
+
+	<bins>
+		<!-- USED To Rebin MASS before fitting -->
+		<mass min="2.4" max="4.5" width="0.040" />
+		
+	</bins>
+
+	<style>
+		<mass xr="2.4, 4.4" min="0" xticks="505" draw="h pe" />
+		<fit linewidth="2" />
+	</style>
+
+
+</config>

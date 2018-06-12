@@ -20,26 +20,9 @@ Double_t evaluate(Double_t *x, Double_t *p){
 		return 0;
 	}
 
-	// if ( x[0] > 3.0 && x[0] < 3.2 ){
-	// 	TF1::RejectPoint();
-	// 	return 0;
-	// }
-
-	
-	/*** GAUSSIAN ***/
-	// double a = 2 * p[2]*p[2];
-	// double b = p[0] / sqrt( TMath::Pi() * a );
-	// double c = x[0] - p[1];
-	// double d = exp( - c*c / a );
-
-	// double r = 0;//b * d;
-
-
-	// r += p[0] + x[0]*p[1] + x[0]*x[0] * p[2] * x[0]*x[0]*x[0] * p[3] + x[0]*x[0]*x[0]*x[0] * p[4];
 
 	fpol->SetParameters( p[0], p[1], p[2], p[3], p[4], p[5] );
 	fg1->SetParameters( p[6], p[7], p[8] );
-	// fg2->SetParameters( p[9], p[10], p[11] );
 
 	return fpol->Eval( x[0] ) + fg1->Eval( x[0] );
 }
@@ -81,7 +64,7 @@ public:
 		float pt1 = config.get<float>( "p.pt1", 0 );
 		float pt2 = config.get<float>( "p.pt2", 1000 );
 
-		Reporter rp( TString::Format("jpsi_%0.2f_to_%0.2f.pdf", pt1, pt2).Data(), 800, 800 );
+		Reporter rp( TString::Format("yield_jpsi_%0.2f_to_%0.2f.pdf", pt1, pt2).Data(), 800, 800 );
 		rp.margins( 0.01, 0.05, 0.15, 0.15 );
 		rp.newPage();
 		
@@ -133,7 +116,10 @@ public:
 
 		hmassrb->Fit( f, "RL", "", fmin, fmax );
 		hmassrb->Fit( f, "RL", "", fmin, fmax );
-		hmassrb->Fit( f, "RL", "", fmin, fmax );
+		// hmassrb->Fit( f, "RL", "", fmin, fmax );
+
+		LOG_F( INFO, "Mass = %0.3f +/- %0.3f", f->GetParameter( 7 ), f->GetParError( 7 ) );
+		LOG_F( INFO, "Width = %0.3f +/- %0.3f", f->GetParameter( 8 ), f->GetParError( 8 ) );
 
 		fg1->SetLineColor(kBlue);
 		rpl.style( fg1 ).set( config, "style.fit" );
@@ -151,6 +137,10 @@ public:
 		double Ns = f->Integral( 2.9, 3.3 ) ;
 		double Nbg = fpol->Integral( 2.9, 3.3 ) ;
 
+		double Nse = f->IntegralError( 2.9, 3.3 ) ;
+		double Nbge = fpol->IntegralError( 2.9, 3.3 ) ;
+
+
 		// Ns *= 1.0/ hmassrb->GetBinWidth(4);
 		// Nbg *= 1.0/ hmassrb->GetBinWidth(4);
 
@@ -158,13 +148,14 @@ public:
 		LOG_F( INFO, "Nbg=%f", Nbg );
 
 		Ns = Ns - Nbg;
+		Nse = Nse + Nbge;
 		
 		double sig = Ns / sqrt( Ns + Nbg );
 
 		TLatex lx;
 		lx.SetTextSize( 12.0 / 380.0);
 		lx.DrawLatexNDC( .18, 0.95, TString::Format("%0.2f < p_{T} < %0.2f (GeV/c)", pt1, pt2) );
-		lx.DrawLatexNDC( .18, 0.9, TString::Format("N_{J/#Psi}^{raw}=%0.3f", Ns) );
+		lx.DrawLatexNDC( .18, 0.9, TString::Format("N_{J/#Psi}^{raw}=%0.3f #pm %0.3f #pm %0.3f", Ns, sqrt(Ns), Nse) );
 		lx.DrawLatexNDC( .18, 0.85, TString::Format("S/B=%0.3f", Ns/Nbg) );
 		lx.DrawLatexNDC( .18, 0.8, TString::Format("S/#sqrt{S + B}=%0.3f", sig) );
 
@@ -174,6 +165,24 @@ public:
 
 		rp.savePage();
 
+		float mpt = (pt1 + pt2)/2.0;
+		if ( book->get( "yield" ) ){
+			int ibin = book->get("yield")->GetXaxis()->FindBin( mpt );
+			book->setBin( "yield", ibin, Ns, sqrt(Ns) );
+		}
+		if ( book->get( "mass" ) ){
+			int ibin = book->get("mass")->GetXaxis()->FindBin( mpt );
+			book->get("mass")->SetBinContent( ibin, f->GetParameter( 7 ) );
+			book->get("mass")->SetBinError( ibin, f->GetParError( 7 ) );
+			
+		}
+		if ( book->get( "width" ) ){
+			int ibin = book->get("width")->GetXaxis()->FindBin( mpt );
+			book->get("width")->SetBinContent( ibin, f->GetParameter( 8 ) );
+			book->get("width")->SetBinError( ibin, f->GetParError( 8 ) );
+			
+		}
+
 
 		f->Write();
 	}
@@ -181,9 +190,49 @@ public:
 	virtual void make(){
 		LOG_F( INFO, "" );
 
-		jpsiFit();
+		book->cd();
+		book->makeAll( nodePath + ".histograms" );
 
-		psi2sFit();
+		for ( string n : {"mass", "width", "yield"} ){
+			if ( book->get(n) )
+				book->get(n)->Sumw2();
+		}
+
+		HistoBins fit_bins( config, "bins.fit" );
+		LOG_F( INFO, "Found %d slices to fit", fit_bins.nBins() );
+		for ( size_t i = 0; i < fit_bins.nBins(); i++ ){
+			float pt1 = fit_bins.getBins()[i];
+			float pt2 = fit_bins.getBins()[i+1];
+			LOG_F( INFO, "Setting pt=(%f, %f)", pt1, pt2 );
+
+			config.set( "p.pt1", ts(pt1) );
+			config.set( "p.pt2", ts(pt2) );
+
+			jpsiFit();
+		}
+	}
+
+	virtual void postMake(){
+		
+		Reporter rp( "yield_jpsi_summary.pdf", 1600, 800 );
+		rp.margins( 0.03, 0.05, 0.15, 0.15 );
+		rp.newPage();
+
+		RooPlotLib rpl;
+		rpl.link( book );
+		rpl.link( &config );
+
+		if ( book->get( "yield" ) ){
+			book->get( "yield" )->Scale( 1.0, "width" );
+			rpl.style( "yield" ).set( "style.yield" ).draw();
+			gPad->SetLogy(1);
+			rp.next();
+		}
+		gPad->SetLogy(0);
+		rpl.style( "mass" ).set( "style.massfit" ).draw();
+		rp.next();
+		rpl.style( "width" ).set( "style.width" ).draw();
+		rp.savePage();
 	}
 
 
@@ -225,7 +274,7 @@ public:
 		TF1 * f = new TF1( "psi2sf", evaluate, 2, 5, 9 );
 		rpl.style( f ).set( config, "style.fit" );
 		f->SetLineColor(kBlack);
-		f->SetParameters( 100, 3.1, 0.3, 4, 5, 6, 40, 3.7, 0.05 );
+		f->SetParameters( 100, 3.1, 0.3, 4, 5, 6, 40, 3.6, 0.05 );
 		f->SetNpx( 500 );
 
 		f->SetParLimits( 6, 0, 10000 );
@@ -234,7 +283,7 @@ public:
 
 		rpl.style( hmassrb ).set( config, "style.mass" ).draw();
 		
-		float fmin = 3.3;
+		float fmin = 3.2;
 		float fmax = 4.5;
 
 		hmassrb->Fit( f, "RL", "", fmin, fmax );

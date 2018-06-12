@@ -38,6 +38,7 @@ using namespace jdb;
 int main( int argc, char* argv[] ) {
 	// loguru::add_file("everything.log", loguru::Truncate, loguru::Verbosity_MAX);
 
+	loguru::init(argc, argv);
 	Logger::setGlobalLogLevel( "none" );
 
 	TaskFactory::registerTaskRunner<PairDstAna>( "PairDstAna" );

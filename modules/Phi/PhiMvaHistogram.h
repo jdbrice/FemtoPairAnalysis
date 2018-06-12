@@ -79,14 +79,16 @@ protected:
 			return;
 		
 
-		if ( sqrt( pow( pair->d1_mPid, 2 ) + pow( pair->d2_mPid, 2 ) ) < pid )
+		float pairPid = sqrt( pow( pair->d1_mPid, 2 ) + pow( pair->d2_mPid, 2 ) );
+		if ( pairPid < pid )
 			return;
 
 		////////////////////////////////////////////////////////////////////////
 		/// Opposite-Sign
 		////////////////////////////////////////////////////////////////////////
 		if ( 0 == pair->mChargeSum ){
-			book->fill( "uls", lv.M(), lv.Pt() );
+			// book->fill( "uls", lv.M(), lv.Pt() );
+			book->fill( "uls", lv.M(), pairPid );
 		} // 0 == pair->mChargeSum
 		else {
 			book->fill( "ls", lv.M(), lv.Pt() );

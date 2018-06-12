@@ -6,6 +6,7 @@
 	<p>
 		<pt1>0.0</pt1>
 		<pt2>15.0</pt2>
+		<psi2s>false</psi2s>
 	</p>
 
 	
@@ -16,18 +17,29 @@
 		<output>
 			<TFile url="jpsi_fit.root" />
 		</output>
+		
+		<histograms>
+			<Histo name="yield" title=";p_{T} (GeV/c); dN/dp_{T} (GeV/c)^{-1}" bins_x="bins.fit" />
+			<Histo name="mass" title=";p_{T} (GeV/c); Mass (GeV/c^{2})" bins_x="bins.fit" />
+			<Histo name="width" title=";p_{T} (GeV/c); Width (GeV/c^{2})" bins_x="bins.fit" />
+		</histograms>
 	</JPsiFitter>
 
 
 	<bins>
 		<!-- USED To Rebin MASS before fitting -->
 		<mass min="2.4" max="4.5" width="0.040" />
-		
+		<fit>0, 1, 2, 3, 4, 6, 15</fit>
 	</bins>
 
 	<style>
 		<mass xr="2.4, 4.4" min="0" xticks="505" draw="h pe" />
 		<fit linewidth="2" />
+
+		<yield draw="hpe"  lc="#000" mc="#000" />
+		<massfit draw="hpe"  min="3.08" max="3.15" lc="#000" mc="#000" />
+		<width draw="hpe"  min="0.001" max="0.1" lc="#000" mc="#000" />
+
 	</style>
 
 

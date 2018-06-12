@@ -30,9 +30,6 @@ protected:
 
 	BranchReader<FemtoPair> _fpr;
 
-	float nSigmaDeltaY = 3.0;
-	float nSigmaDeltaZ = 3.0;
-
 	HistoBins ptBins;
 
 	float pid = 1.0;
@@ -50,8 +47,6 @@ public:
 		
 		book->cd();
 
-		nSigmaDeltaY = config.getFloat( "p.nSigmaDeltaY", 3.0 );
-		nSigmaDeltaZ = config.getFloat( "p.nSigmaDeltaZ", 3.0 );
 
 		ptBins.load( config, "bins.pt" );
 
@@ -73,10 +68,10 @@ protected:
 		if ( pair->d2_mTriggerFlag <= 0 )
 			return;
 
-		if ( pair->d1_mPt < 1.5 && pair->d2_mPt < 1.5 )
-			return;
+		// if ( pair->d1_mPt < 1.5 && pair->d2_mPt < 1.5 )
+		// 	return;
 
-		if ( pair->d1_mPt < 1.3 || pair->d2_mPt < 1.3 )
+		if ( pair->d1_mPt < 1.1 || pair->d2_mPt < 1.1 )
 			return;
 
 		if ( fabs(pair->d1_mEta) > 0.5 || fabs(pair->d2_mEta) > 0.5 )
@@ -84,8 +79,8 @@ protected:
 		if ( fabs(lv.Rapidity()) > 0.5 )
 			return;
 		
-
-		if ( pair->d1_mPid < pid || pair->d2_mPid < pid )
+		float pairPid = sqrt( pow( pair->d1_mPid,2 ) + pow( pair->d2_mPid,2 ) );
+		if ( pairPid < pid )
 			return;
 
 		////////////////////////////////////////////////////////////////////////
@@ -93,9 +88,8 @@ protected:
 		////////////////////////////////////////////////////////////////////////
 		if ( 0 == pair->mChargeSum ){
 			book->fill( "uls", lv.M(), lv.Pt() );
+			// book->fill( "uls", lv.M(), pairPid );
 		} // 0 == pair->mChargeSum
-
-
 	} //analyzeEvent
 
 
