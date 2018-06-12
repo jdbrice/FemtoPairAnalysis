@@ -263,6 +263,8 @@ public:
 
 		TH1 * hmass = huls->ProjectionX( TString::Format( "mass_%d_to_%d", ipt1, ipt2 ), ipt1, ipt2 );
 
+		hmass->Sumw2();
+
 		HistoBins sigMassBins;
 		sigMassBins.load( config, "bins.mass" );
 		TH1 * hmassrb = hmass->Rebin( 

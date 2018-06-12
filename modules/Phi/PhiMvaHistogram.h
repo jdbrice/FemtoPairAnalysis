@@ -33,6 +33,7 @@ protected:
 	HistoBins ptBins;
 
 	float pid = 1.0;
+	string yvar;
 
 public:
 
@@ -50,6 +51,7 @@ public:
 		ptBins.load( config, "bins.pt" );
 
 		pid = config.get<float>( "p.pid", 1.0 );
+		yvar = config.get<string>( "p.y", "pt" );
 	}
 protected:
 
@@ -87,8 +89,10 @@ protected:
 		/// Opposite-Sign
 		////////////////////////////////////////////////////////////////////////
 		if ( 0 == pair->mChargeSum ){
-			// book->fill( "uls", lv.M(), lv.Pt() );
-			book->fill( "uls", lv.M(), pairPid );
+			if ( "pid" == yvar )
+				book->fill( "uls", lv.M(), pairPid );
+			else 
+				book->fill( "uls", lv.M(), lv.Pt() );
 		} // 0 == pair->mChargeSum
 		else {
 			book->fill( "ls", lv.M(), lv.Pt() );

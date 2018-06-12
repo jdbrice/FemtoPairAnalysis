@@ -113,7 +113,7 @@ public:
 			mu = 0.47;
 		}
 
-		f->SetParameters( 100, 1.04, 0.3, 4, 5, 6, 610, mu, 0.05 );
+		f->SetParameters( 1.2e5, -1.2e5, -1.2e4, 3.7e4, 2.5e4, -1.9e4, 610, mu, 0.015 );
 		
 		f->SetNpx( 500 );
 
@@ -139,9 +139,8 @@ public:
 		// }
 
 
-		hmassrb->Fit( f, "RL", "", fmin, fmax );
-		hmassrb->Fit( f, "RL", "", fmin, fmax );
-		hmassrb->Fit( f, "RL", "", fmin, fmax );
+		// hmassrb->Fit( f, "QR", "", fmin, fmax );
+		hmassrb->Fit( f, "RLE", "", fmin, fmax );
 
 		float fmu  = f->GetParameter( 7 );
 		float fsig = f->GetParameter( 8 );
@@ -182,20 +181,27 @@ public:
 		Ns = Ns - Nbg;
 		Nse = Nse + Nbge;
 
+		double SoBe = (Ns/Nbg) * sqrt( pow( sqrt(Ns) / Ns,2) + pow( sqrt(Nbg) / Nbg, 2 ) );
+
+		LOG_F( INFO, "S/B=%0.3e #pm %0.3e", Ns/Nbg, SoBe );
+
 		LOG_F( INFO, "Ns-Nbg=%f", Ns );
 		
-		double sig = Ns / sqrt( Ns + Nbg );
+		double N = Ns + Nbg;
+		double Ne = sqrt( N );
+		double sig = Ns / Ne;
+		double sige = sig * (Nse / Ns);
 
 		TLatex lx;
 		lx.SetTextSize( 12.0 / 380.0);
-		lx.DrawLatexNDC( .18, 0.9, TString::Format("%0.2f < p_{T} < %0.2f (GeV/c)", pt1, pt2) );
+		lx.DrawLatexNDC( .18, 0.9, TString::Format("%0.2f < %s < %0.2f %s", pt1, config.get<string>("p.y-title", "p_{T}").c_str(), pt2, config.get<string>("p.y-units", "(GeV/c)").c_str() ) );
 		lx.DrawLatexNDC( .18, 0.85, TString::Format("N_{#phi}^{raw}=%0.3f #pm %0.3f #pm %0.3f", Ns, sqrt(Ns), Nse) );
 		lx.DrawLatexNDC( .18, 0.8, TString::Format("S/B=%0.3f", Ns/Nbg) );
 		lx.DrawLatexNDC( .18, 0.75, TString::Format("S/#sqrt{S + B}=%0.3f", sig) );
 
-		lx.DrawLatexNDC( .18, 0.6, TString::Format("p0=%0.3f", phi_fg1->GetParameter(0) ) );
-		lx.DrawLatexNDC( .18, 0.55, TString::Format("#mu=%0.3f", phi_fg1->GetParameter(1)) );
-		lx.DrawLatexNDC( .18, 0.5, TString::Format("#sigma=%0.3f", phi_fg1->GetParameter(2)) );
+		lx.DrawLatexNDC( .18, 0.6, TString::Format("p0=%0.3f #pm %0.2e", f->GetParameter(6), f->GetParError(6) ) );
+		lx.DrawLatexNDC( .18, 0.55, TString::Format("#mu=%0.3f #pm %0.2e", f->GetParameter(7), f->GetParError(7)) );
+		lx.DrawLatexNDC( .18, 0.5, TString::Format("#sigma=%0.3f #pm %0.2e", f->GetParameter(8), f->GetParError(8)) );
 
 		lx.DrawLatexNDC( .68, 0.9, TString::Format( "%s", title ) );
 
@@ -220,6 +226,18 @@ public:
 			book->get("width")->SetBinError( ibin, f->GetParError( 8 ) );
 			
 		}
+		if ( book->get( "SoverB" ) ){
+			int ibin = book->get("SoverB")->GetXaxis()->FindBin( mpt );
+			book->get("SoverB")->SetBinContent( ibin, Ns/Nbg );
+			book->get("SoverB")->SetBinError( ibin, SoBe );
+			
+		}
+		if ( book->get( "significance" ) ){
+			int ibin = book->get("significance")->GetXaxis()->FindBin( mpt );
+			book->get("significance")->SetBinContent( ibin, sig );
+			book->get("significance")->SetBinError( ibin, sige );
+			
+		}
 
 
 		f->Write();
@@ -231,7 +249,7 @@ public:
 		book->cd();
 		book->makeAll( nodePath + ".histograms" );
 
-		for ( string n : {"mass", "width", "yield"} ){
+		for ( string n : {"mass", "width", "yield", "SoverB", "significance"} ){
 			if ( book->get(n) )
 				book->get(n)->Sumw2();
 		}
@@ -263,7 +281,8 @@ public:
 		rpl.link( &config );
 
 		if ( book->get( "yield" ) ){
-			book->get( "yield" )->Scale( 1.0, "width" );
+			if ( true == config.get<bool>( "p.scalebw", true ) )
+				book->get( "yield" )->Scale( 1.0, "width" );
 			rpl.style( "yield" ).set( "style.yield" ).draw();
 			gPad->SetLogy(1);
 			rp.next();
@@ -272,7 +291,11 @@ public:
 		rpl.style( "mass" ).set( "style.massfit" ).draw();
 		rp.next();
 		rpl.style( "width" ).set( "style.width" ).draw();
-		rp.savePage();
+		rp.next();
+		rpl.style( "SoverB" ).set( "style.SoverB" ).draw();
+		rp.next();
+		rpl.style( "significance" ).set( "style.significance" ).draw();
+		rp.next();
 	}
 
 };
