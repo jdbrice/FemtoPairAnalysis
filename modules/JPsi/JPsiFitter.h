@@ -107,7 +107,7 @@ public:
 		rpl.style( hmassrb ).set( config, "style.mass" ).draw();
 		
 		float fmax = 4.5;
-		float fmin = 2.5;
+		float fmin = 2.6;
 		if ( pt1 < 1.0 ){
 			fmax = 4.5;
 			fmin = 2.6;

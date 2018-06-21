@@ -5,32 +5,33 @@
 	<sys>pp</sys>
 	<mod>DNN_N6</mod>
 	<debug></debug>
-	
+	<id></id>
 
 	<p>
 		<mixedName>hmw_1_301</mixedName>
-		<eff>0.40</eff>
+		<eff>0.08</eff>
 		<bgsource>mix</bgsource>
 		<bgscaler>1.0</bgscaler>
 
 		<minPt>0.0</minPt>
-		<pidCut>1.0</pidCut>
+		<pidCut>1.2</pidCut>
 	</p>
 	
 
 	<BackgroundMaker>
 		
 		<input>
-			<TFile url="mixed_{sys}_{mod}_cs2_pid1.0_1.5_pT{p.minPt}_100.25.root" name="mixed" />
+			<TFile url="mixed_{sys}_{mod}_cs2_pid{p.pidCut}_1.5_pT{p.minPt}_100.25.root" name="mixed" />
 			<TFile url="raw-{sys}-{mod}-pid{p.pidCut}-minPt{p.minPt}.root" name="data" />
-			<TFile url="{DIMUON_ROOT}/PairPurityFitter/bin/pair-ratio-{sys}-{mod}.root" name="corr" />
-			<TFile url="MTD_Scaled_STAR.root" name="cocktail" />
+			<TFile url="{DIMUON_ROOT}/PairPurityFitter/bin/pair-ratio-{sys}-{mod}-pid{p.pidCut}to1.5{id}.root" name="corr" />
+			<TFile url="{DIMUON_ROOT}/data/Cocktail/MTDMTD-Scaled.root" name="cocktail" />
 		</input>
 
 		<normRange min="0.6" max="1.1" />
 
 		<output>
-			<TFile url="background-{sys}-{mod}{debug}.root" />
+			<TFile url="background-{sys}-{mod}-pid{p.pidCut}{debug}.root" />
+			<Report url="rpBackground-{sys}-{mod}-pid{p.pidCut}{debug}.pdf" />
 		</output>
 
 		<histograms>
@@ -41,13 +42,13 @@
 
 	<bins>
 		<!-- nominal -->
-		<mass>0.0, 0.21, 0.3, 0.4, 0.53, 0.56, 0.6, 0.65, 0.7, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76, 0.77, 0.78, 0.79, 0.8, 0.82, 0.86,  0.9, 0.94, 0.98, 1.0, 1.02, 1.04, 1.1, 1.2, 1.75, 2.4, 2.5, 2.75, 2.9, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0, 4.5, 5.0, 5.5, 6.0</mass>
+		<mass>0.0, 0.21, 0.25, 0.3, 0.4, 0.53, 0.56, 0.6, 0.65,  0.72, 0.74, 0.75, 0.77, 0.780, 0.79, 0.8, 0.82, 0.86,  0.9, 0.94, 0.98, 1.0, 1.01, 1.02, 1.03, 1.04, 1.1, 1.5, 1.75, 2.5, 2.75, 2.9, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0, 4.5, 5.0, 5.5, 6.0</mass>
 
 		<!-- lmr small bins -->
 		<!-- <mass>0.0, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.3, 0.31, 0.32, 0.33, 0.34, 0.35, 0.36, 0.37, 0.38, 0.39, 0.4, 0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.53, 0.56, 0.7, 0.76, 0.77, 0.78, 0.79, 0.8, 0.9, 0.97, 1.0, 1.02, 1.04, 1.06, 1.08, 1.10, 1.11, 1.12, 1.13, 1.14, 1.15, 1.20, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 2.9, 3.0, 3.04, 3.08, 3.12, 3.16, 3.2, 3.24, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0, 4.5, 5.0, 5.5, 6.0</mass> -->
 
-		<!-- <corrmass width="0.1" min="0" max="4.0" /> -->
-		<corrmass>0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.46, 0.47, 0.48, 0.49, 0.6, 0.7, 0.75, 0.8, 0.85, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.2, 2.4, 2.6, 2.8, 3.5, 4.0, 5.0, 6.0</corrmass>
+		<!-- <corrmass width="0.05" min="0.2" max="4.0" /> -->
+		<corrmass>0.2, 0.25, 0.3, 0.35, 0.4, 0.46, 0.47, 0.48, 0.49, 0.6, 0.7, 0.75, 0.8, 0.85, 1.0, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.2, 2.4, 2.6, 2.8, 3.5, 4.0, 5.0, 6.0</corrmass>
 	</bins>
 
 	<style>
@@ -57,13 +58,24 @@
 		<corr mc="#000" lc="#000" draw="hpe" grid-y="1" axis-digits="3" x-title="M_{#mu#mu} (GeV/c^{2})" y-title="R = unlike-sign / like-sign"/>
 		<bg mc="#00F" lc="#00F" draw="hpe" grid-y="0" axis-digits="3" x-title="M_{#mu#mu} (GeV/c^{2})" y-title="dN/dM_{#mu#mu} (GeV/c^{2})^{-1}"/>
 
-		<sig mc="#FF0D9B" lc="#FF0D9B" lw="1"/>
+		<sig mc="#FF0D9B" lc="#FF0D9B" lw="1" marker-style="29" marker-size="2" />
 
-		<cocktail lw="2" draw=" hist C" />
-		<cocktail_sum lc="#000" />
-		<cocktail_eta_mumu lc="#83BF17" />
+		<SoverB lc="#000" mc="#000" draw="hpe" min="1e-2" max="10" y-title="S / B"/>
 
-		<SoverB lc="#000" mc="#000" draw="hpe" min="1e-2" max="10" />
+		<cocktail>
+			<common lw="2" draw=" hist C" />
+			<eta_mumu line-color="#83BF17" />
+			<ccbar_mumu line-color="#0B99BC" />
+			<jpsi_mumu line-color="#D14D28" />
+			<psi_mumu line-color="#F14D28" />
+			<omega_mumu line-color="#0000FF" />
+			<omega_pi0mumu_dalitz line-color="#59C8DF" />
+			<rho_mumu line-color="#737495" />
+			<phi_mumu line-color="#D14D28" />
+			<eta_gammamumu_dalitz line-color="#ff703f" />
+			<etaprime_gammamumu_dalitz line-color="#73503C" />
+			<sum line-color="#000" />
+		</cocktail>
  	</style>
 
 </config>

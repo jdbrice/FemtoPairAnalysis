@@ -75,8 +75,8 @@ protected:
 		if ( pair->d1_mPt < 1.1 || pair->d2_mPt < 1.1 )
 			return;
 
-		if ( fabs(pair->d1_mEta) > 0.5 || fabs(pair->d2_mEta) > 0.5 )
-			return;
+		// if ( fabs(pair->d1_mEta) > 0.5 || fabs(pair->d2_mEta) > 0.5 )
+		// 	return;
 		if ( fabs(lv.Rapidity()) > 0.5 )
 			return;
 		

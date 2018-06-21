@@ -283,6 +283,14 @@ public:
 		if ( book->get( "yield" ) ){
 			if ( true == config.get<bool>( "p.scalebw", true ) )
 				book->get( "yield" )->Scale( 1.0, "width" );
+			if ( true == config.get<bool>( "p.scalept", true ) ){
+				for ( int i = 1; i < book->get("yield")->GetXaxis()->GetNbins(); i++ ){
+					float v = book->get("yield")->GetBinContent(i);
+					float mpt = book->get("yield")->GetBinCenter(i);
+					book->get("yield")->SetBinContent( i, v / mpt );
+				}
+			}
+
 			rpl.style( "yield" ).set( "style.yield" ).draw();
 			gPad->SetLogy(1);
 			rp.next();

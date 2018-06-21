@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<Task name="PhiFitter" type="PhiFitter" config="" nodePath="PhiFitter"  />
-	<mod></mod>
+	<sys>pp</sys>
+	<mod>DNN_N6</mod>
 	<name></name>
 
 
@@ -18,16 +19,18 @@
 	
 	<PhiFitter>
 		<input>
-			<TFile url="phi_histograms{name}.root" />
+			<TFile url="phi-{sys}-{mod}-histograms{name}.root" />
 		</input>
 		<output>
-			<TFile url="phi_fit{name}.root" />
+			<TFile url="phi-fit-{sys}-{mod}{name}.root" />
 		</output>
 
 		<histograms>
 			<Histo name="yield" title=";p_{T} (GeV/c); dN/dp_{T} (GeV/c)^{-1}" bins_x="bins.fit" />
 			<Histo name="mass" title=";p_{T} (GeV/c); Mass (GeV/c^{2})" bins_x="bins.fit" />
 			<Histo name="width" title=";p_{T} (GeV/c); Width (GeV/c^{2})" bins_x="bins.fit" />
+			<Histo name="SoverB" title=";pairPid; S/B" bins_x="bins.fit" />
+			<Histo name="significance" title=";pairPid; significance" bins_x="bins.fit" />
 		</histograms>
 	</PhiFitter>
 
@@ -35,7 +38,7 @@
 	<bins>
 		<!-- USED To Rebin MASS before fitting -->
 		<mass min="0.2" max="1.8" width="0.01" />
-		<fit>2, 3, 3.5, 4, 15</fit>
+		<fit> 2, 3, 3.5, 4, 15</fit>
 	</bins>
 
 	<style>
@@ -43,7 +46,7 @@
 		<fit linewidth="2" />
 		<fitext line-width="2" line-style="2" line-color="#F00" />
 
-		<yield draw="hpe"  lc="#000" mc="#000" />
+		<yield draw="hpe"  lc="#000" mc="#000" xr="0, 15"/>
 		<massfit draw="hpe"  min="1.0" max="1.03" lc="#000" mc="#000" />
 		<width draw="hpe"  min="0.001" max="0.05" lc="#000" mc="#000"  axis-digits="4"/>
 	</style>

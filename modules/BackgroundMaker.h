@@ -9,6 +9,10 @@
 class BackgroundMaker : public HistoAnalyzer {
 protected:
 	map<string, HistoBins> bins;
+
+	//parts of the cocktail
+	map<string,TH2 * > h2d;
+	map<string,TH1 * > h1d;
 public:
 
 	BackgroundMaker(){}
@@ -106,19 +110,16 @@ public:
 	}
 
 
-	virtual void draw_cocktail(){
+	virtual void make_cocktail(){
 		// get the 2D histograms
-		map<string,TH2 * > h2d;
-		map<string,TH1 * > h1d;
-
 		RooPlotLib rpl;
 		float minPt = config.get<float>("p.minPt");
 
-		vector<string> components = { "eta_mumu", "ccbar_mumu", "jpsi_mumu", "omega_mumu", "omega_pi0mumu", "rho_mumu", "phi_mumu", "eta_gammamumu", "etaprime_gammamumu" };
+		vector<string> components = { "eta_mumu", "ccbar_mumu", "jpsi_mumu", "psi_mumu", "omega_mumu", "omega_pi0mumu_dalitz", "rho_mumu", "phi_mumu", "eta_gammamumu_dalitz", "etaprime_gammamumu_dalitz" };
 		for ( string n : components ){
 			h2d[ n ] = get<TH2>( "Scaled_pT_" + n );
-			LOG_F( INFO, "Cocktail: %s", n.c_str()  );
-
+			LOG_F( INFO, "Cocktail: %s=%p", n.c_str(), h2d[n]  );
+			if ( nullptr == h2d[n] ) continue;
 
 			int ipt1 = h2d[n]->GetYaxis()->FindBin( minPt );
 			LOG_F( INFO, "minPt = %f, bin = %d", minPt, ipt1 );
@@ -134,11 +135,22 @@ public:
 			}
 			h1d[ "sum" ]->Add( h1d[ n ] );
 
-			rpl.style( h1d[ n ] ).set( config, "style.cocktail" ).set( config, "style.cocktail_" + n ).draw("same");
+			// rpl.style( h1d[ n ] ).set( config, "style.cocktail" ).set( config, "style.cocktail_" + n ).draw("same");
 		}
 
-		rpl.style( h1d["sum"] ).set( config, "style.cocktail" ).set( config, "style.cocktail_sum" ).draw( "same" );
+		// rpl.style( h1d["sum"] ).set( config, "style.cocktail" ).set( config, "style.cocktail_sum" ).draw( "same" );
 
+	}
+
+	virtual void draw_cocktail(){
+		// get the 2D histograms
+		RooPlotLib rpl;
+		vector<string> components = { "eta_mumu", "ccbar_mumu", "jpsi_mumu", "psi_mumu", "omega_mumu", "omega_pi0mumu_dalitz", "rho_mumu", "phi_mumu", "eta_gammamumu_dalitz", "etaprime_gammamumu_dalitz" };
+		for ( string n : components ){
+			if ( nullptr == h1d[ n ] ) continue;
+			rpl.style( h1d[ n ] ).set( config, "style.cocktail.common" ).set( config, "style.cocktail." + n ).draw("same");
+		}
+		rpl.style( h1d["sum"] ).set( config, "style.cocktail.common" ).set( config, "style.cocktail.sum" ).draw( "same" );
 	}
 
 	virtual void make(){
@@ -161,7 +173,7 @@ public:
 		assert( hraw_mix );
 		assert( hraw_corr );
 
-		hraw_mix->Scale( 1.0/5.0 );
+		hraw_mix->Scale( 1.0/10.0 );
 
 		TH1 * hrb_uls  = HistoBins::rebin1D( "rb_uls" , hraw_uls , bins["mass"] );
 		TH1 * hrb_ls   = HistoBins::rebin1D( "rb_ls"  , hraw_ls  , bins["mass"] );
@@ -196,7 +208,8 @@ public:
 		hraw_bg->Scale( config.get<float>("p.bgscaler", 1.0) );
 		hrb_bg->Scale( config.get<float>("p.bgscaler", 1.0) );
 
-		Reporter rp( "rpBackground-" + config["sys"] + "-" + config["mod"] + config["debug"] + ".pdf", 1900, 1200 );
+
+		Reporter rp( config[nodePath + ".output.Report:url" ] , 1900, 1200 );
 		rp.newPage();
 		rp.margins( 0.05, 0.02, 0.13, 0.12 );
 
@@ -279,6 +292,28 @@ public:
 		// rpl.style( hrb_ls ).set( config, "style.ls" ).draw("same");
 		
 		leg0->AddEntry( hraw_uls, "Data #mu^{+}#mu^{-}", "lp" );
+
+		lx.DrawLatexNDC( 0.6, 0.9, TString::Format( "Run15 %s at #sqrt{s} = 200 GeV", config["sys"].c_str() ) );
+		lx.DrawLatexNDC( 0.2, 0.90, "p_{T}^{#mu} > 1.1 (GeV/c), |#eta^{#mu}| < 0.5" );
+		lx.DrawLatexNDC( 0.2, 0.85, "p_{T}^{#mu#mu} > 0.0 (GeV/c), |y_{#mu#mu}| < 0.5" );
+
+
+		leg0->Draw("same");
+
+		rp.next();
+
+		/*************************************************************************************************************************
+		* Page 5b
+		* Unlike-Sign + Background LMR
+		* ******************************/
+
+		rpl.style( hraw_uls ).set( config, "style.uls" ).set( "x-range", 0.2, 1.2 ).set( "grid-y", 1 ).draw();
+		rpl.style( hrb_uls ).set( config, "style.uls" ).draw("same");
+		rpl.style( hraw_bg ).set( config, "style.bg" ).draw("same");
+		rpl.style( hrb_bg ).set( config, "style.bg" ).draw("same");
+		rpl.style( hraw_mix ).set( config, "style.mixed" ).draw("same");
+		rpl.style( hrb_mix ).set( config, "style.mixed" ).draw("same");
+		// rpl.style( hrb_ls ).set( config, "style.ls" ).draw("same");
 
 		lx.DrawLatexNDC( 0.6, 0.9, TString::Format( "Run15 %s at #sqrt{s} = 200 GeV", config["sys"].c_str() ) );
 		lx.DrawLatexNDC( 0.2, 0.90, "p_{T}^{#mu} > 1.1 (GeV/c), |#eta^{#mu}| < 0.5" );
@@ -409,6 +444,7 @@ public:
 		// rpl.style( hraw_sig ).set( config, "style.sig" ).draw("same");
 		rpl.style( hrb_sig ).set( config, "style.sig" ).draw("same");
 
+		make_cocktail();
 		draw_cocktail();
 
 		gPad->SetLogy(1);
@@ -421,7 +457,87 @@ public:
 		rp.next();
 
 
+		/*************************************************************************************************************************
+		* Page 11
+		* Signal + Cocktail
+		* ******************************/
+		// rpl.style( hraw_uls ).set( config, "style.uls" ).set( "min", 10 ).draw();
+		// rpl.style( hrb_uls ).set( config, "style.uls" ).draw("same");
+		// rpl.style( hraw_bg ).set( config, "style.bg" ).draw("same");
+		// rpl.style( hrb_bg ).set( config, "style.bg" ).draw("same");
+		// rpl.style( hraw_mix ).set( config, "style.mixed" ).draw("same");
+		// rpl.style( hrb_mix ).set( config, "style.mixed" ).draw("same");
+		// rpl.style( hraw_sig ).set( config, "style.sig" ).draw("same");
+		rpl.style( hrb_sig ).set( config, "style.sig" ).set("min", 1).set("draw", "hpe").draw();
 
+		// make_cocktail();
+		draw_cocktail();
+
+		rpl.style( hrb_sig ).set( config, "style.sig" ).set("min", 10).draw("same");
+
+		gPad->SetLogy(1);
+
+		// leg0->Draw("same");
+
+		lx.DrawLatexNDC( 0.6, 0.9, TString::Format( "Run15 %s at #sqrt{s} = 200 GeV", config["sys"].c_str() ) );
+		lx.DrawLatexNDC( 0.2, 0.90, "p_{T}^{#mu} > 1.1 (GeV/c), |#eta^{#mu}| < 0.5" );
+		lx.DrawLatexNDC( 0.2, 0.85, "p_{T}^{#mu#mu} > 0.0 (GeV/c), |y_{#mu#mu}| < 0.5" );
+		rp.next();
+
+
+		/*************************************************************************************************************************
+		* Page 12
+		* Signal + Cocktail: LMR
+		* ******************************/
+		// rpl.style( hraw_uls ).set( config, "style.uls" ).set( "min", 10 ).draw();
+		// rpl.style( hrb_uls ).set( config, "style.uls" ).draw("same");
+		// rpl.style( hraw_bg ).set( config, "style.bg" ).draw("same");
+		// rpl.style( hrb_bg ).set( config, "style.bg" ).draw("same");
+		// rpl.style( hraw_mix ).set( config, "style.mixed" ).draw("same");
+		// rpl.style( hrb_mix ).set( config, "style.mixed" ).draw("same");
+		// rpl.style( hraw_sig ).set( config, "style.sig" ).draw("same");
+		rpl.style( hrb_sig ).set( config, "style.sig" ).set("min", 1).set("draw", "hpe").set("x-range", 0, 1.2).set("max", 5e5).draw();
+
+		// make_cocktail();
+		draw_cocktail();
+
+		rpl.style( hrb_sig ).set( config, "style.sig" ).set("min", 10).draw("same");
+
+		gPad->SetLogy(1);
+
+		// leg0->Draw("same");
+
+		lx.DrawLatexNDC( 0.6, 0.9, TString::Format( "Run15 %s at #sqrt{s} = 200 GeV", config["sys"].c_str() ) );
+		lx.DrawLatexNDC( 0.2, 0.90, "p_{T}^{#mu} > 1.1 (GeV/c), |#eta^{#mu}| < 0.5" );
+		lx.DrawLatexNDC( 0.2, 0.85, "p_{T}^{#mu#mu} > 0.0 (GeV/c), |y_{#mu#mu}| < 0.5" );
+		rp.next();
+
+		hraw_uls->Write();
+		hraw_ls->Write();
+		hraw_corr->Write();
+
+
+		/*************************************************************************************************************************
+		* Page 13
+		* Signal / Cocktail
+		* ******************************/
+
+		TH1 * hrb_ratio = (TH1*)hrb_sig->Clone( "hrb_ratio" );
+		hrb_ratio->Reset();
+		for ( int i = 1; i < hrb_sig->GetXaxis()->GetNbins(); i++ ){
+			double v = hrb_sig->GetBinContent( i );
+			double x = hrb_sig->GetBinCenter( i );
+			double cv = h1d["sum"]->GetBinContent( h1d["sum"]->GetXaxis()->FindBin( x ) );
+
+			if ( cv == 0 ) continue;
+			if (v == 0) continue;
+			hrb_ratio->SetBinContent( i, v / cv );
+			LOG_F( INFO, "v=%f, x=%f, cv=%f", v, x, cv );
+		}
+		gPad->SetLogy(0);
+		rpl.style( hrb_ratio ).set( config, "style.sig" ).set("min", 0).set("draw", "hpe").set("x-range", 0, 6).set("max", 10).draw();
+
+		rp.next();
 	}
 };
 

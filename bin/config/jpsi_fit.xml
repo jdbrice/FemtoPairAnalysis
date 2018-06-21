@@ -29,7 +29,7 @@
 	<bins>
 		<!-- USED To Rebin MASS before fitting -->
 		<mass min="2.4" max="4.5" width="0.040" />
-		<fit>0, 1, 2, 3, 4, 6, 15</fit>
+		<fit>0, 1, 2.2, 150</fit>
 	</bins>
 
 	<style>
